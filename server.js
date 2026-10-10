@@ -27,7 +27,7 @@ MongoClient.connect(MONGO_URI).then(c => {
 }).catch(e => console.error('DB Error', e));
 // env parsing moved above
 const KEY = process.env.NVIDIA_API_KEY,
-  MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct";
+  MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.1-70b-instruct";
 const BASE = (
   process.env.NVIDIA_BASE_URL || "https://integrate.api.nvidia.com/v1"
 ).replace(/\/$/, "");
@@ -171,7 +171,9 @@ async function llm(system, user, max = 1024) {
   });
   const j = await r.json();
   if (!r.ok) {
-    const e = new Error("upstream: " + JSON.stringify(j).slice(0, 300));
+    const errMsg = JSON.stringify(j).slice(0, 400);
+    console.error('LLM error:', r.status, errMsg);
+    const e = new Error("upstream " + r.status + ": " + errMsg);
     e.code = 502;
     throw e;
   }
@@ -208,6 +210,16 @@ const server = http
       }
       if (p === "/api/health")
         return send(res, 200, { server: true, ok: !!KEY, model: MODEL });
+      if (p === "/api/test-llm") {
+        if (!KEY) return send(res, 503, { ok: false, error: 'NVIDIA_API_KEY not set', model: MODEL });
+        try {
+          const t0 = Date.now();
+          const result = await llm('Reply with ONLY valid JSON: {"status":"ok","msg":"LLM working"}', 'test', 80);
+          return send(res, 200, { ok: true, model: MODEL, ms: Date.now() - t0, result });
+        } catch(e) {
+          return send(res, 502, { ok: false, model: MODEL, error: String(e.message) });
+        }
+      }
       if (p === "/api/events") {
         res.writeHead(200, {
           "Content-Type": "text/event-stream",

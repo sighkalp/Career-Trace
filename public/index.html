@@ -974,6 +974,7 @@
           Mentor view
         </button>
         <button class="p" onclick="openChat()">Ask Guide</button>
+        <button onclick="testLLM()" id="testLLMBtn" style="margin-left:8px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);color:#a0a4b0;font-size:12px;padding:4px 10px" title="Test if AI is working">⚡ Test AI</button>
         <button onclick="logout()" style="border-color: #c8161d; color: #fff; background: #c8161d; margin-left: 8px;">Log Out</button>
       </header>
       <div
@@ -1412,6 +1413,29 @@
           act: [],
           route: {},
           rev: null,
+        };
+      }
+      // seedForUser: blank state using the real user's profile data — used when LLM fails
+      function seedForUser(u) {
+        S = {
+          p: {
+            name: u && (u.fullname || u.username) ? (u.fullname || u.username) : 'You',
+            college: u && u.college ? u.college : '',
+            role: '',
+            hours: 0,
+            budget: 0,
+            weeks: 0,
+            github: u && u.username ? u.username : '',
+          },
+          skills: [],
+          projects: [],
+          nodes: [],
+          act: ['Welcome! AI roadmap generation failed — tell Guide your target role to get started.'],
+          route: {},
+          rev: null,
+          known: {},
+          extra: {},
+          ts: Date.now(),
         };
       }
       // State is always loaded from server — never from localStorage cache.
@@ -4568,13 +4592,17 @@
                     render();
                     window.showToast && window.showToast("🎉 Your personalized roadmap is ready!", "success");
                   } else {
-                    window.showToast && window.showToast("AI generation failed — try refreshing.", "error");
+                    // LLM returned but bad data — use user-specific blank state
+                    seedForUser(currentUser);
                     render();
+                    window.showToast && window.showToast("AI generation failed — try clicking ⚡ Test AI in the topbar.", "error");
                   }
                 } catch(e) {
                   hideOnboardingLoader();
-                  window.showToast && window.showToast("Could not reach AI — try refreshing.", "error");
+                  // LLM call failed entirely — use user-specific blank state
+                  seedForUser(currentUser);
                   render();
+                  window.showToast && window.showToast("AI unreachable — click ⚡ Test AI to diagnose.", "error");
                 }
                 LOADED = true;
                 pushState();
@@ -5179,6 +5207,23 @@
             document.getElementById('ep_msg').textContent = 'Failed to save. Try again.';
           }
         };
+      }
+
+      async function testLLM() {
+        const btn = document.getElementById('testLLMBtn');
+        if (btn) { btn.textContent = '⏳ Testing…'; btn.disabled = true; }
+        try {
+          const r = await api('/api/test-llm');
+          if (btn) { btn.textContent = '⚡ Test AI'; btn.disabled = false; }
+          if (r.ok) {
+            window.showToast && window.showToast(`✅ AI working! Model: ${r.model} (${r.ms}ms)`, 'success');
+          } else {
+            window.showToast && window.showToast(`❌ AI failed: ${r.error || 'Unknown error'}\nModel: ${r.model}`, 'error');
+          }
+        } catch(e) {
+          if (btn) { btn.textContent = '⚡ Test AI'; btn.disabled = false; }
+          window.showToast && window.showToast('❌ Cannot reach server', 'error');
+        }
       }
 
       function logout() {
