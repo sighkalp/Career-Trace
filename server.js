@@ -300,8 +300,8 @@ const server = http
           return send(res, e.code || 500, { error: String(e.message || e) });
         }
       }
-      // Auth endpoints
       if (post && p === "/api/auth/login") {
+        if (!usersCol) return send(res, 503, { error: "Database not connected. Check MongoDB Atlas Network Access (IP Whitelist)." });
         const b = await body(req);
         const userDoc = await usersCol.findOne({ username: b.username });
         if (!userDoc) {
@@ -314,8 +314,8 @@ const server = http
         return send(res, 200, { ok: true, token, user: { username: userDoc.username } });
       }
       if (post && p === "/api/auth/register") {
+        if (!usersCol) return send(res, 503, { error: "Database not connected. Check MongoDB Atlas Network Access (IP Whitelist)." });
         const b = await body(req);
-        if (!b.username || !b.password) return send(res, 400, { error: 'Missing fields' });
         const existing = await usersCol.findOne({ username: b.username });
         if (existing) return send(res, 400, { error: 'Username taken' });
         const hashed = bcrypt.hashSync(b.password, 10);
