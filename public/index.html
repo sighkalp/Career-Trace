@@ -4434,8 +4434,21 @@
           "afterend",
           '<span class="badge" id="live">Guide: offline rules</span>',
         );
-      if (!S || !S.nodes || !S.known) seed();
-      else {
+      let currentUser = null;
+      try { currentUser = JSON.parse(localStorage.getItem('ct_user')); } catch(e) {}
+      
+      if (!S || !S.nodes || !S.known) {
+        if (currentUser) {
+          blank();
+          S.p.name = currentUser.username;
+        } else {
+          seed();
+        }
+      } else if (currentUser && S.p && S.p.name === "Aarav Mehta" && currentUser.username !== "Aarav Mehta") {
+        // Clear cached demo data if they logged into a real account
+        blank();
+        S.p.name = currentUser.username;
+      } else {
         S.extra = S.extra || {};
         relayout();
         syncItems();
