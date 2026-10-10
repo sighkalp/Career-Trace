@@ -304,7 +304,10 @@ const server = http
       if (post && p === "/api/auth/login") {
         const b = await body(req);
         const userDoc = await usersCol.findOne({ username: b.username });
-        if (!userDoc || !bcrypt.compareSync(b.password, userDoc.password)) {
+        if (!userDoc) {
+          return send(res, 401, { error: "Invalid username or password" });
+        }
+        if (!bcrypt.compareSync(b.password, userDoc.password)) {
           return send(res, 401, { error: "Invalid username or password" });
         }
         const token = jwt.sign({ id: userDoc._id, username: userDoc.username }, JWT_SECRET, { expiresIn: '7d' });
