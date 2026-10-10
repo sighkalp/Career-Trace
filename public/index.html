@@ -1,0 +1,5041 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>CareerTrace</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;700&family=Geist+Mono:wght@400&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+      :root {
+        --ink: #0b0c0f;
+        --night: #15171c;
+        --ivory: #e8ebf0;
+        --paper: #fff;
+        --brass: #2f54eb;
+        --bs: #dce4ff;
+        --ox: #e8890c;
+        --slate: #667085;
+        --line: #d5dae3;
+        --txt: #0b0c0f;
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --ivory: #0b0c0f;
+          --paper: #15171c;
+          --line: #262a33;
+          --txt: #eceef2;
+          --bs: #1b2238;
+        }
+      }
+      :root[data-theme="dark"] {
+        --ivory: #0b0c0f;
+        --paper: #15171c;
+        --line: #262a33;
+        --txt: #eceef2;
+        --bs: #1b2238;
+      }
+      html {
+        scroll-padding-top: env(safe-area-inset-top, 0px);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--ivory);
+        color: var(--txt);
+        font:
+          15px/1.5 Geist,
+          system-ui,
+          sans-serif;
+        display: flex;
+        min-height: 100vh;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: Geist, system-ui, sans-serif;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .m {
+        font:
+          12px "Geist Mono",
+          ui-monospace,
+          monospace;
+        color: var(--slate);
+      }
+      nav {
+        width: 190px;
+        background: var(--ink);
+        color: #e8e2d4;
+        padding: 20px 14px;
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        flex: none;
+      }
+      nav h1 {
+        font-size: 20px;
+        margin-bottom: 20px;
+      }
+      nav a {
+        display: block;
+        padding: 8px 10px;
+        border-radius: 8px;
+        color: #c9c3b4;
+        text-decoration: none;
+      }
+      nav a:hover {
+        background: var(--night);
+        color: #fff;
+      }
+      @media (max-width: 800px) {
+        nav {
+          display: none;
+        }
+      }
+      .wrap {
+        flex: 1;
+        min-width: 0;
+      }
+      header {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        padding: 14px 24px;
+        border-bottom: 1px solid var(--line);
+        flex-wrap: wrap;
+        background: var(--ink);
+        color: #e8e2d4;
+      }
+      header .sp {
+        flex: 1;
+      }
+      header .m {
+        color: #a7b0c0;
+      }
+      main {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 24px;
+        display: grid;
+        grid-template-columns: repeat(12, 1fr);
+        gap: 16px;
+      }
+      section {
+        background: var(--paper);
+        border: 0;
+        border-radius: 24px;
+        padding: 22px;
+        box-shadow:
+          0 1px 0 rgba(11, 12, 15, 0.04),
+          0 24px 48px -28px rgba(11, 12, 15, 0.4);
+      }
+      .s4 {
+        grid-column: span 4;
+      }
+      .s8 {
+        grid-column: span 8;
+      }
+      .s6 {
+        grid-column: span 6;
+      }
+      .s12 {
+        grid-column: span 12;
+      }
+      @media (max-width: 900px) {
+        .s4,
+        .s8,
+        .s6 {
+          grid-column: span 12;
+        }
+      }
+      section h2 {
+        font-size: 19px;
+        margin-bottom: 10px;
+      }
+      section h2 small {
+        font:
+          12px "IBM Plex Mono",
+          monospace;
+        color: var(--brass);
+        margin-right: 8px;
+      }
+      button,
+      select,
+      input {
+        font: inherit;
+        color: var(--txt);
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: var(--paper);
+        border-radius: 8px;
+        padding: 5px 11px;
+      }
+      button.p {
+        background: var(--brass);
+        border-color: var(--brass);
+        color: #fff;
+      }
+      button:focus-visible,
+      input:focus-visible,
+      select:focus-visible {
+        outline: 2px solid var(--brass);
+        outline-offset: 2px;
+      }
+      input,
+      select,
+      textarea {
+        border: 1px solid var(--line);
+        background: var(--ivory);
+        border-radius: 8px;
+        padding: 6px 8px;
+        width: 100%;
+      }
+      .row {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: center;
+        margin: 8px 0;
+      }
+      .bar {
+        height: 6px;
+        background: var(--line);
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--brass);
+        transition: width 0.7s;
+      }
+      .bar i.g {
+        background: var(--ox);
+      }
+      .badge {
+        font:
+          12px "IBM Plex Mono",
+          monospace;
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        padding: 1px 8px;
+        color: var(--slate);
+      }
+      .b1 {
+        color: var(--brass);
+        border-color: var(--brass);
+      }
+      .b2 {
+        color: var(--ox);
+        border-color: var(--ox);
+      }
+      .tilt {
+        transition: transform 0.15s;
+        transform-style: preserve-3d;
+      }
+      svg text {
+        font:
+          12px Inter,
+          sans-serif;
+        fill: var(--txt);
+      }
+      .node {
+        cursor: pointer;
+      }
+      .node rect.c {
+        fill: var(--paper);
+        stroke: var(--line);
+        stroke-width: 1.5;
+      }
+      .node.done rect.c {
+        stroke: var(--brass);
+      }
+      .node.prog rect.c {
+        stroke: var(--ox);
+      }
+      .node.lock {
+        opacity: 0.4;
+      }
+      .node.dim {
+        opacity: 0.18;
+      }
+      .node.fl rect.c {
+        stroke: var(--brass);
+        stroke-width: 3;
+      }
+      .edge {
+        fill: none;
+        stroke: var(--line);
+        stroke-width: 2;
+        stroke-dasharray: 4 4;
+        animation: d 1s linear infinite;
+      }
+      .edge.on {
+        stroke: var(--brass);
+      }
+      @keyframes d {
+        to {
+          stroke-dashoffset: -8;
+        }
+      }
+      .tick {
+        stroke: var(--brass);
+        stroke-width: 3;
+        fill: none;
+        stroke-dasharray: 24;
+        stroke-dashoffset: 0;
+        animation: t 0.5s ease-out;
+      }
+      @keyframes t {
+        from {
+          stroke-dashoffset: 24;
+        }
+      }
+      .ck {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        margin: 6px 0;
+      }
+      .ck.d span {
+        text-decoration: line-through;
+        color: var(--slate);
+      }
+      .ck span {
+        flex: 1;
+      }
+      .ck .x {
+        border: 0;
+        padding: 0 6px;
+        color: var(--slate);
+      }
+      .box {
+        width: 20px;
+        height: 20px;
+        border: 1.5px solid var(--slate);
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        flex: none;
+      }
+      .d .box {
+        border-color: var(--brass);
+      }
+      #panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(480px, 100%);
+        background: var(--paper);
+        border-left: 1px solid var(--line);
+        padding: calc(18px + env(safe-area-inset-top, 0px)) 18px 18px;
+        overflow: auto;
+        transform: translateX(105%);
+        transition: transform 0.3s;
+        z-index: 8;
+      }
+      #panel.open {
+        transform: none;
+      }
+      .tabs {
+        display: flex;
+        gap: 6px;
+        margin: 10px 0;
+        flex-wrap: wrap;
+      }
+      .tabs button.on {
+        background: var(--ink);
+        color: #fff;
+      }
+      #launch {
+        position: fixed;
+        right: 20px;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        border-radius: 99px;
+        padding: 12px 20px;
+        background: var(--ink);
+        color: #fff;
+        z-index: 5;
+      }
+      #chat {
+        position: fixed;
+        right: 16px;
+        bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+        width: min(440px, calc(100% - 32px));
+        height: min(560px, 72%);
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        display: none;
+        flex-direction: column;
+        box-shadow: 0 14px 40px -12px rgba(0, 0, 0, 0.5);
+        z-index: 9;
+      }
+      #chat.open {
+        display: flex;
+      }
+      #chat header {
+        border-radius: 12px 12px 0 0;
+        padding: 10px 14px;
+      }
+      #log {
+        flex: 1;
+        overflow: auto;
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .b {
+        max-width: 92%;
+        padding: 8px 12px;
+        border-radius: 10px;
+        border: 1px solid var(--line);
+        background: var(--ivory);
+      }
+      .b.u {
+        align-self: flex-end;
+        background: var(--ink);
+        color: #fff;
+        border-color: var(--ink);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      #f {
+        display: flex;
+        gap: 6px;
+        padding: 10px;
+        border-top: 1px solid var(--line);
+      }
+      .ctx {
+        display: flex;
+        gap: 4px;
+        flex-wrap: wrap;
+        padding: 6px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      #modal {
+        position: fixed;
+        inset: 0;
+        background: rgba(14, 23, 38, 0.55);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 12;
+        padding: 16px;
+      }
+      #modal.open {
+        display: flex;
+      }
+      #modal form {
+        background: var(--paper);
+        border-radius: 12px;
+        padding: 20px;
+        width: min(420px, 100%);
+        max-height: 90%;
+        overflow: auto;
+      }
+      label.f {
+        display: block;
+        margin: 8px 0;
+      }
+      label.f span {
+        display: block;
+      }
+      .stamp {
+        color: var(--ox);
+        border: 1px solid var(--ox);
+        padding: 0 6px;
+        border-radius: 4px;
+        font:
+          11px "IBM Plex Mono",
+          monospace;
+      }
+      body {
+        background-image: radial-gradient(var(--line) 1px, transparent 1px);
+        background-size: 22px 22px;
+      }
+      section {
+        border: 2px solid var(--txt);
+        border-radius: 16px;
+        box-shadow: 6px 6px 0 var(--txt);
+      }
+      section h2 {
+        font-size: 22px;
+      }
+      #hero {
+        order: -2;
+      }
+      #roadmap {
+        order: -1;
+      }
+      button {
+        border: 2px solid var(--txt);
+        box-shadow: 2px 2px 0 var(--txt);
+        font-weight: 500;
+        transition:
+          transform 0.12s,
+          box-shadow 0.12s;
+      }
+      button:hover {
+        transform: translate(-1px, -1px);
+        box-shadow: 3px 3px 0 var(--txt);
+      }
+      button:active {
+        transform: translate(2px, 2px);
+        box-shadow: 0 0 0 var(--txt);
+      }
+      button.p {
+        background: #ffe45c;
+        color: #0b0c0f;
+        border-color: var(--txt);
+      }
+      .box,
+      .ck .x {
+        box-shadow: none !important;
+        transform: none !important;
+      }
+      .ck .x {
+        border: 0;
+      }
+      .node text {
+        fill: #0b0c0f;
+      }
+      .node rect.c {
+        fill: #ffe45c;
+        stroke: #0b0c0f;
+        stroke-width: 2.5;
+      }
+      .node {
+        filter: drop-shadow(4px 4px 0 #0b0c0f);
+        transition: filter 0.15s;
+      }
+      .node:hover {
+        filter: drop-shadow(8px 8px 0 #0b0c0f);
+      }
+      .node.done rect.c {
+        fill: #0b0c0f;
+      }
+      .node.done text {
+        fill: #fff !important;
+      }
+      .node.lock rect.c {
+        fill: #e4e4de;
+      }
+      .node.prog rect.c {
+        fill: #ffe45c;
+        stroke: #2f54eb;
+        stroke-width: 4;
+      }
+      .node.skp rect.c {
+        fill: #fff;
+        stroke-dasharray: 6 4;
+      }
+      .edge {
+        stroke: var(--txt);
+        stroke-width: 2;
+      }
+      .edge.on {
+        stroke: #2f54eb;
+        stroke-width: 3;
+      }
+      /* THEME: metallic red + black */
+      html:root:root {
+        --ink: #0a0a0b;
+        --night: #141416;
+        --ivory: #0a0a0b;
+        --paper: #121214;
+        --brass: #c8161d;
+        --red: #c8161d;
+        --bs: #2a0b0d;
+        --ox: #b8bcc4;
+        --slate: #9a9aa3;
+        --line: #2b2b30;
+        --txt: #f2f2f3;
+        --metal: linear-gradient(160deg, #f0545a 0%, #c8161d 40%, #7e0d13 100%);
+      }
+      a {
+        color: #f0545a;
+      }
+      nav {
+        border-right: 2px solid #2b2b30;
+      }
+      header {
+        border-bottom: 2px solid var(--red);
+      }
+      header button {
+        color: var(--txt) !important;
+      }
+      section {
+        background: var(--paper);
+        border: 2px solid #34343a;
+        box-shadow: 6px 6px 0 #7e0d13;
+      }
+      #hero {
+        border-color: var(--red);
+      }
+      button {
+        border: 2px solid #3a3a40;
+        box-shadow: 2px 2px 0 #7e0d13;
+        background: #17171a;
+        color: var(--txt);
+      }
+      button:hover {
+        box-shadow: 3px 3px 0 #7e0d13;
+      }
+      button.p,
+      .tabs button.on,
+      #launch {
+        background: var(--metal);
+        color: #fff;
+        border-color: #000;
+        box-shadow:
+          2px 2px 0 #000,
+          inset 0 1px 0 rgba(255, 255, 255, 0.35);
+      }
+      .bar {
+        background: #26262b;
+      }
+      .bar i {
+        background: var(--metal);
+      }
+      .bar i.g {
+        background: #b8bcc4;
+      }
+      .b.u {
+        background: var(--red);
+        border-color: var(--red);
+      }
+      #strip {
+        background: var(--metal) !important;
+        color: #fff !important;
+        border-bottom: 2px solid #000 !important;
+      }
+      #strip span[style] {
+        border-color: #000 !important;
+        background: #2a0b0d !important;
+      }
+      #strip span[style] i {
+        background: #fff !important;
+      }
+      .node text {
+        fill: #f2f2f3;
+      }
+      .node rect.c {
+        fill: #141416;
+        stroke: #6a6a72;
+      }
+      .node {
+        filter: drop-shadow(4px 4px 0 #6e0b10);
+      }
+      .node:hover {
+        filter: drop-shadow(8px 8px 0 #6e0b10);
+      }
+      .node.done rect.c {
+        fill: #c8161d;
+        stroke: #f0545a;
+      }
+      .node.done .tick {
+        stroke: #fff;
+      }
+      .node.prog rect.c {
+        fill: #141416;
+        stroke: #f0545a;
+        stroke-width: 4;
+      }
+      .node.lock rect.c {
+        fill: #0f0f11;
+      }
+      .node.skp rect.c {
+        fill: #0f0f11;
+        stroke-dasharray: 6 4;
+      }
+      .edge {
+        stroke: #55555c;
+      }
+      .edge.on {
+        stroke: #e03a3e;
+      }
+      /* progress card removed; wider skills, projects, weekly plan */
+      #progress {
+        display: none;
+      }
+      #profile {
+        grid-column: span 5;
+      }
+      #skills {
+        grid-column: span 7;
+      }
+      #projects {
+        grid-column: span 7;
+      }
+      section:has(#next) {
+        grid-column: span 5;
+      }
+      @media (max-width: 900px) {
+        #profile,
+        #skills,
+        #projects,
+        section:has(#next) {
+          grid-column: span 12;
+        }
+      }
+      .pips {
+        display: flex;
+        gap: 3px;
+      }
+      .pips i {
+        flex: 1;
+        height: 9px;
+        border-radius: 2px;
+        border: 1px solid var(--line);
+      }
+      .pips i.t {
+        border-color: var(--red);
+      }
+      .pips i.f {
+        background: var(--metal);
+        border-color: #000;
+      }
+      .card {
+        border: 2px solid #34343a;
+        border-radius: 12px;
+        padding: 10px;
+        margin-bottom: 10px;
+      }
+      .chip {
+        display: inline-block;
+        margin: 0 5px 5px 0;
+        padding: 2px 9px;
+        border-radius: 99px;
+        border: 1.5px solid #55555c;
+        font-size: 12px;
+        cursor: pointer;
+        color: var(--slate);
+      }
+      .chip.k {
+        background: var(--metal);
+        color: #fff;
+        border-color: #000;
+      }
+      .x2 {
+        font-size: 12px;
+        padding: 2px 8px;
+      }
+      /* THEME: olive + pistachio + white (muted, not vibrant, not faded) */
+      html:root:root {
+        --ink: #2b3318;
+        --night: #3a4522;
+        --ivory: #f5f7ee;
+        --paper: #fff;
+        --brass: #6b7d3a;
+        --red: #6b7d3a;
+        --bs: #e4ecd0;
+        --ox: #a9b88a;
+        --slate: #667052;
+        --line: #d6dec3;
+        --txt: #2b3318;
+        --metal: linear-gradient(160deg, #8fa35a 0%, #6b7d3a 48%, #4b5a27 100%);
+      }
+      body {
+        background-color: var(--ivory);
+      }
+      a {
+        color: #55692b;
+      }
+      nav {
+        border-right: 2px solid #3a4522;
+      }
+      header {
+        border-bottom: 2px solid #8fa35a;
+      }
+      section {
+        background: #fff;
+        border: 2px solid #c9d3b0;
+        box-shadow: 5px 5px 0 #d6dec3;
+      }
+      #hero {
+        border-color: #6b7d3a;
+        box-shadow: 5px 5px 0 #c9d3b0;
+      }
+      button {
+        border: 2px solid #b7c49a;
+        box-shadow: 2px 2px 0 #d6dec3;
+        background: #fff;
+        color: var(--txt);
+      }
+      button:hover {
+        box-shadow: 3px 3px 0 #c9d3b0;
+      }
+      button.p,
+      .tabs button.on,
+      #launch {
+        background: var(--metal);
+        color: #fff;
+        border-color: #3f4c20;
+        box-shadow:
+          2px 2px 0 #c9d3b0,
+          inset 0 1px 0 rgba(255, 255, 255, 0.3);
+      }
+      .bar {
+        background: #e4ecd0;
+      }
+      .bar i {
+        background: var(--metal);
+      }
+      .bar i.g {
+        background: #a9b88a;
+      }
+      .b.u {
+        background: #6b7d3a;
+        border-color: #6b7d3a;
+      }
+      .badge {
+        border-color: #b7c49a;
+      }
+      .b2 {
+        color: #7a5b1e !important;
+        border-color: #b8964a !important;
+      }
+      #strip {
+        background: var(--metal) !important;
+        color: #fff !important;
+        border-bottom: 2px solid #3f4c20 !important;
+      }
+      #strip span[style] {
+        border-color: #2b3318 !important;
+        background: #3a4522 !important;
+      }
+      #strip span[style] i {
+        background: #fff !important;
+      }
+      .node text {
+        fill: #2b3318;
+      }
+      .node rect.c {
+        fill: #fff;
+        stroke: #a9b88a;
+      }
+      .node {
+        filter: drop-shadow(4px 4px 0 #d6dec3);
+      }
+      .node:hover {
+        filter: drop-shadow(8px 8px 0 #c9d3b0);
+      }
+      .node.done rect.c {
+        fill: #6b7d3a;
+        stroke: #4b5a27;
+      }
+      .node.done text {
+        fill: #fff !important;
+      }
+      .node.done .tick {
+        stroke: #fff;
+      }
+      .node.prog rect.c {
+        fill: #f5f7ee;
+        stroke: #3a4522;
+        stroke-width: 4;
+      }
+      .node.lock rect.c {
+        fill: #eef1e4;
+      }
+      .node.skp rect.c {
+        fill: #eef1e4;
+        stroke-dasharray: 6 4;
+      }
+      .edge {
+        stroke: #a9b88a;
+      }
+      .edge.on {
+        stroke: #6b7d3a;
+      }
+      .chip {
+        border: 1.5px solid #a9b88a;
+        color: var(--slate);
+        background: #fff;
+      }
+      .chip.k {
+        background: var(--metal);
+        color: #fff;
+        border-color: #4b5a27;
+      }
+      .card {
+        border: 2px solid #d6dec3;
+      }
+      .pips i {
+        border-color: #c9d3b0;
+      }
+      .pips i.t {
+        border-color: #6b7d3a;
+      }
+      .pips i.f {
+        border-color: #4b5a27;
+      }
+      .node.lock {
+        opacity: 0.72;
+      }
+      #rm svg {
+        transition: transform 0.6s;
+      }
+      #rm.t3 {
+        perspective: 1400px;
+        overflow: hidden;
+      }
+      #rm.t3 svg {
+        transform: rotateX(52deg) rotateZ(-7deg) scale(0.88);
+        transform-origin: 50% 15%;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition: none !important;
+          animation: none !important;
+        }
+      }
+      /* Modern UI Push */
+      nav {
+        background: rgba(11, 12, 15, 0.85) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-right: 1px solid rgba(255, 255, 255, 0.05) !important;
+      }
+      nav a {
+        transition: all 0.2s ease;
+        margin-bottom: 4px;
+      }
+      nav a:hover {
+        background: rgba(255, 255, 255, 0.08) !important;
+        transform: translateX(4px);
+      }
+      header {
+        background: rgba(11, 12, 15, 0.85) !important;
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      button {
+        transition: all 0.2s ease !important;
+        border-radius: 8px;
+      }
+      button:hover {
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+      }
+      section {
+        border-radius: 16px !important;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      section:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0,0,0,0.1) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <h1>CareerTrace</h1>
+      <a href="#profile">Profile</a><a href="#progress">Progress</a
+      ><a href="#skills">Skills</a><a href="#roadmap">Roadmap</a
+      ><a href="#projects">Projects</a><a href="#people">People</a
+      ><a href="#resources">Resources</a><a href="#community">Community</a
+      ><a href="#activity">Activity</a>
+    </nav>
+    <div class="wrap">
+      <header>
+        <span id="who"></span><span class="sp"></span>
+        <span class="m" id="pct"></span>
+        <button onclick="toggleMentor()" style="color: #0e1726; background: #fff;">
+          Mentor view
+        </button>
+        <button class="p" onclick="openChat()">Ask Guide</button>
+        <button onclick="logout()" style="border-color: #c8161d; color: #fff; background: #c8161d; margin-left: 8px;">Log Out</button>
+      </header>
+      <div
+        id="strip"
+        style="
+          padding: 10px 24px;
+          border-bottom: 2px solid var(--txt);
+          background: #ffe45c;
+          color: #0b0c0f;
+          display: flex;
+          gap: 16px;
+          align-items: center;
+          flex-wrap: wrap;
+          font-size: 13px;
+        "
+      ></div>
+      <main>
+        <section
+          class="s12"
+          id="hero"
+          style="
+            padding: 0;
+            overflow: hidden;
+            position: relative;
+            background: #232b14;
+          "
+        >
+          <canvas
+            id="cv"
+            style="
+              width: 100%;
+              height: 420px;
+              display: block;
+              touch-action: pan-y;
+              cursor: grab;
+            "
+          ></canvas>
+          <div
+            id="hp"
+            style="
+              position: absolute;
+              left: 28px;
+              top: 22px;
+              color: #fff;
+              pointer-events: none;
+            "
+          ></div>
+          <div
+            style="
+              position: absolute;
+              left: 28px;
+              bottom: 18px;
+              color: #8a93a6;
+              font:
+                12px &quot;Geist Mono&quot;,
+                monospace;
+              pointer-events: none;
+            "
+          >
+            Drag to rotate. Hover a tower for evidence. Click to open the skill.
+          </div>
+          <div
+            id="tip"
+            style="
+              position: absolute;
+              display: none;
+              background: #fff;
+              color: #0b0c0f;
+              border-radius: 10px;
+              padding: 8px 10px;
+              font-size: 12px;
+              pointer-events: none;
+              max-width: 230px;
+            "
+          ></div>
+        </section>
+        <section class="s4 tilt" id="profile">
+          <h2><small>01</small>Profile</h2>
+          <div id="prof"></div>
+          <div class="m" style="margin-top: 10px">Profile completeness</div>
+          <div class="bar"><i id="comp"></i></div>
+          <div id="nudge" class="m" style="margin-top: 6px"></div>
+          <button style="margin-top: 10px" onclick="startOver()">
+            Start from scratch
+          </button>
+          <button onclick="reseed()">Load demo</button>
+        </section>
+        <section class="s4 tilt" id="progress">
+          <h2><small>02</small>Progress</h2>
+          <div style="display: flex; gap: 14px; align-items: center">
+            <svg width="110" height="110" viewBox="0 0 110 110">
+              <circle
+                cx="55"
+                cy="55"
+                r="44"
+                fill="none"
+                stroke="var(--line)"
+                stroke-width="10"
+              />
+              <circle
+                id="ring"
+                cx="55"
+                cy="55"
+                r="44"
+                fill="none"
+                stroke="var(--brass)"
+                stroke-width="10"
+                stroke-dasharray="276.5"
+                stroke-dashoffset="276.5"
+                transform="rotate(-90 55 55)"
+                style="transition: stroke-dashoffset 0.8s"
+              />
+              <text
+                id="rt"
+                x="55"
+                y="60"
+                text-anchor="middle"
+                style="font: 700 20px Geist"
+              ></text>
+            </svg>
+            <div>
+              <div id="track"></div>
+              <div class="m" id="left"></div>
+              <div class="m" id="wk"></div>
+              <div class="m" id="cost"></div>
+            </div>
+          </div>
+          <div class="bar" style="margin-top: 12px"><i id="cbar"></i></div>
+          <div id="phases" style="margin-top: 12px"></div>
+        </section>
+        <section class="s4 tilt" id="skills">
+          <h2><small>03</small>Skills</h2>
+          <div id="sk"></div>
+          <button style="margin-top: 10px" onclick="addSkill()">
+            Add skill
+          </button>
+        </section>
+        <section class="s12" id="roadmap">
+          <h2><small>04</small>Roadmap</h2>
+          <div class="row">
+            <span
+              ><select id="flt" onchange="render()" style="width: auto">
+                <option>All</option>
+                <option>Left</option>
+                <option>Done</option>
+                <option>In progress</option>
+              </select></span
+            ><span class="m" id="tradeoffs"></span>
+          </div>
+          <div style="overflow-x: auto" id="rm"></div>
+        </section>
+        <section class="s4 tilt">
+          <h2><small>05</small>Do this week</h2>
+          <div id="next"></div>
+        </section>
+        <section class="s8 tilt" id="projects">
+          <h2><small>06</small>Projects</h2>
+          <div id="proj"></div>
+          <button style="margin-top: 10px" onclick="addProject()">
+            Add project
+          </button>
+        </section>
+        <section class="s6" id="people">
+          <h2><small>07</small>People</h2>
+          <div id="ppl"></div>
+        </section>
+        <section class="s6" id="activity">
+          <h2><small>08</small>Activity</h2>
+          <div id="act"></div>
+        </section>
+        <section class="s12" id="resources" style="grid-column: span 12">
+          <h2><small>09</small>Resources</h2>
+          <div class="row" style="justify-content: flex-start; flex-wrap: wrap">
+            <select
+              style="width: auto"
+              onchange="
+                R.tier = this.value;
+                rsrc();
+              "
+            >
+              <option>All</option>
+              <option>free</option>
+              <option>paid</option>
+              <option>cert</option></select
+            ><select
+              style="width: auto"
+              onchange="
+                R.sk = this.value;
+                rsrc();
+              "
+            >
+              <option>All</option>
+              <option>Python</option>
+              <option>SQL</option>
+              <option>Stats</option>
+              <option>ML</option>
+              <option>DL</option></select
+            ><input
+              style="width: 150px"
+              type="number"
+              placeholder="Max cost (Rs)"
+              oninput="
+                R.max = this.value;
+                rsrc();
+              "
+            /><span class="m"
+              >Demo list: links and costs are unverified. Edit CRS in the
+              code.</span
+            >
+          </div>
+          <div
+            id="rcards"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+              gap: 12px;
+            "
+          ></div>
+        </section>
+        <section class="s12" id="community" style="grid-column: span 12">
+          <h2><small>10</small>Community</h2>
+          <div id="fp" style="margin-bottom: 10px"></div>
+          <div
+            id="grps"
+            style="
+              display: grid;
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+              gap: 12px;
+            "
+          ></div>
+          <div class="m" style="margin-top: 8px">
+            Demo peers and groups, seeded for the prototype.
+          </div>
+        </section>
+      </main>
+    </div>
+    <aside id="panel" aria-label="Node detail"></aside>
+    <div id="modal"><form id="mf"></form></div>
+    <button id="launch" onclick="openChat()">Guide</button>
+    <aside id="chat">
+      <header>
+        <b>Guide</b><span class="sp"></span
+        ><button onclick="closeChat()" style="color: #0e1726">Minimize</button>
+      </header>
+      <div class="ctx" id="ctx"></div>
+      <div id="log"></div>
+      <form id="f" onsubmit="send(event)">
+        <input
+          id="in"
+          placeholder="Type or tap an option"
+          autocomplete="off"
+        /><button class="p">Send</button>
+      </form>
+    </aside>
+    <script>
+      const $ = (i) => document.getElementById(i),
+        esc = (s) =>
+          String(s).replace(
+            /[&<>"]/g,
+            (c) =>
+              ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+          ),
+        uid = () => Math.random().toString(36).slice(2, 8);
+      /* STORE: one object; everything shown is derived by selectors below. */
+      const CAT = [
+        {
+          id: "py",
+          t: "Python & data basics",
+          ph: "Prerequisite",
+          h: 30,
+          paid: 0,
+          req: [],
+          sk: ["Python"],
+          pr: 5,
+          it: "Install Python & Jupyter|Pandas basics course|Clean a messy CSV|Plot with matplotlib",
+        },
+        {
+          id: "sql",
+          t: "SQL for analytics",
+          ph: "Prerequisite",
+          h: 20,
+          paid: 0,
+          req: ["py"],
+          sk: ["SQL"],
+          pr: 5,
+          it: "SELECT & JOINs tutorial|Window functions|Solve 20 practice queries|Query a real dataset",
+        },
+        {
+          id: "st",
+          t: "Statistics",
+          ph: "Prerequisite",
+          h: 40,
+          paid: 0,
+          req: ["py"],
+          sk: ["Stats"],
+          pr: 4,
+          it: "Probability basics|Distributions|Hypothesis testing|A/B test write-up",
+        },
+        {
+          id: "ml",
+          t: "Machine learning",
+          ph: "SteppingStone",
+          h: 60,
+          paid: 4500,
+          freeH: 75,
+          req: ["sql", "st"],
+          sk: ["ML"],
+          pr: 4,
+          it: "Linear & logistic regression|Trees & ensembles|Cross-validation|Model on a real dataset|Error analysis report",
+        },
+        {
+          id: "dl",
+          t: "Deep learning",
+          ph: "Specialization",
+          h: 50,
+          paid: 3500,
+          freeH: 55,
+          req: ["ml"],
+          sk: ["DL"],
+          pr: 2,
+          it: "Neural net from scratch|CNN basics|Fine-tune a small model",
+        },
+        {
+          id: "cap",
+          t: "Capstone",
+          ph: "TargetRole",
+          h: 50,
+          paid: 0,
+          req: ["ml"],
+          sk: ["Projects"],
+          pr: 3,
+          it: "Pick a data source|Week-1 vertical slice|Benchmark & evaluate|Write the README",
+        },
+      ];
+      const POS = {
+        py: [10, 90],
+        sql: [210, 20],
+        st: [210, 160],
+        ml: [410, 90],
+        dl: [610, 20],
+        cap: [610, 160],
+      };
+      let S;
+      function seed() {
+        S = {
+          p: {
+            name: "Aarav Mehta",
+            college: "DTU, Year 3",
+            role: "Data Scientist",
+            hours: 8,
+            budget: 5000,
+            weeks: 20,
+            github: "aarav-m",
+          },
+          skills: [
+            {
+              id: "s1",
+              name: "Python",
+              cat: "Core",
+              lvl: 3,
+              tgt: 4,
+              ev: ["repo: stock-scraper"],
+            },
+            { id: "s2", name: "SQL", cat: "Core", lvl: 1, tgt: 4, ev: [] },
+            {
+              id: "s3",
+              name: "Stats",
+              cat: "Core",
+              lvl: 2,
+              tgt: 4,
+              ev: ["cert: NPTEL Stats"],
+            },
+            { id: "s4", name: "ML", cat: "ML", lvl: 1, tgt: 4, ev: [] },
+            { id: "s5", name: "DL", cat: "ML", lvl: 0, tgt: 3, ev: [] },
+            {
+              id: "s6",
+              name: "Projects",
+              cat: "Core",
+              lvl: 1,
+              tgt: 4,
+              ev: ["repo: stock-scraper"],
+            },
+          ],
+          projects: [
+            {
+              id: "p1",
+              t: "Price-anomaly detector",
+              tags: ["Python", "scraping"],
+              st: "Building",
+              rub: [
+                { c: "Runs end to end", p: 1 },
+                { c: "Tests added", p: 1 },
+                { c: "Benchmarked", p: 0 },
+                { c: "README written", p: 0 },
+              ],
+              sk: ["Projects", "ML"],
+              node: "cap",
+              ver: null,
+              req: false,
+            },
+          ],
+          nodes: [],
+          act: ["Joined group SQL Sprint"],
+          route: {},
+          rev: null,
+        };
+        CAT.forEach((c) => S.nodes.push(mk(c)));
+        S.nodes[0].items.forEach((i) => (i.done = 1));
+        S.nodes[1].items[0].done = 1;
+      }
+      function mk(c) {
+        return {
+          ...c,
+          notes: "",
+          items: c.it
+            .split("|")
+            .map((t, i) => ({ id: uid(), text: t, done: 0, skip: 0 })),
+        };
+      }
+      function blank() {
+        S = {
+          p: {
+            name: "You",
+            college: "",
+            role: "",
+            hours: 0,
+            budget: 0,
+            weeks: 0,
+            github: "",
+          },
+          skills: [],
+          projects: [],
+          nodes: [],
+          act: [],
+          route: {},
+          rev: null,
+        };
+      }
+      try {
+        const x = localStorage.getItem("ct2");
+        S = x ? JSON.parse(x) : null;
+      } catch (e) {
+        S = null;
+      }
+      function save() {
+        if (LOADED) S.ts = Date.now();
+        try {
+          localStorage.setItem("ct2", JSON.stringify(S));
+        } catch (e) {}
+        pushState();
+      }
+      /* SELECTORS (all derived, none stored) */
+      const act = (n) => n.items.filter((i) => !i.skip),
+        dn = (n) => act(n).filter((i) => i.done).length,
+        tot = (n) => act(n).length;
+      const nPct = (n) => (tot(n) ? dn(n) / tot(n) : 0),
+        left = () => S.nodes.reduce((a, n) => a + tot(n) - dn(n), 0);
+      const overall = () => {
+        if (S.skills && S.skills.length) {
+          const t = S.skills.reduce((a, s) => a + s.tgt, 0);
+          return t
+            ? Math.round(
+                (S.skills.reduce((a, s) => a + Math.min(lvl(s), s.tgt), 0) /
+                  t) *
+                  100,
+              )
+            : 0;
+        }
+        const t = S.nodes.reduce((a, n) => a + tot(n), 0);
+        return t
+          ? Math.round((S.nodes.reduce((a, n) => a + dn(n), 0) / t) * 100)
+          : 0;
+      };
+      const locked = (n) =>
+        !n.req.every((r) => {
+          const x = S.nodes.find((q) => q.id === r);
+          return !x || tot(x) === 0 || nPct(x) >= 0.8 || n.unl;
+        });
+      const projVer = (n) => S.projects.some((p) => p.node === n.id && p.ver);
+      function lvl(s) {
+        const ns = S.nodes.filter((n) => n.sk.includes(s.name)),
+          t = ns.reduce((a, n) => a + tot(n), 0),
+          d = ns.reduce((a, n) => a + dn(n), 0),
+          r = t ? d / t : 0;
+        let v = Math.max(
+          s.lvl,
+          s.rl || 0,
+          Math.round(s.lvl + (s.tgt - s.lvl) * r),
+        );
+        if (S.projects.some((p) => p.ver && p.sk.includes(s.name)))
+          v = Math.min(5, v + 1);
+        return v;
+      }
+      function nextHint(s) {
+        const ns = S.nodes.filter((n) => n.sk.includes(s.name)),
+          t = ns.reduce((a, n) => a + tot(n), 0),
+          d = ns.reduce((a, n) => a + dn(n), 0),
+          v = lvl(s);
+        if (!t || v >= s.tgt) return "";
+        for (let k = 1; k <= t - d; k++) {
+          const r = (d + k) / t;
+          if (Math.round(s.lvl + (s.tgt - s.lvl) * r) > v)
+            return `Level ${v} to ${v + 1} after ${k} more item${k > 1 ? "s" : ""}`;
+        }
+        return "";
+      }
+      /* PLANNER (pure). plan(nodes,hours,budget,weeks,route) -> {weeks,cost,tradeoffs,stretch,eff}
+ Example: hours=8,budget=2000: ML paid Rs4500 -> free (+15h), DL paid Rs3500 -> free (+5h); tradeoffs say so; if weeks>deadline, lowest-priority unfinished nodes become stretch. */
+      function plan(nodes, hours, budget, weeks, route) {
+        const eff = {},
+          tr = [];
+        nodes.forEach(
+          (n) => (eff[n.id] = route[n.id] || (n.paid ? "fast" : "free")),
+        );
+        const unf = (n) => tot(n) - dn(n) > 0,
+          rem = (n) =>
+            (eff[n.id] === "free" && n.freeH ? n.freeH : n.h) *
+            (tot(n) ? (tot(n) - dn(n)) / tot(n) : 0),
+          cost = () =>
+            nodes.reduce(
+              (a, n) => a + (unf(n) && eff[n.id] === "fast" ? n.paid : 0),
+              0,
+            );
+        nodes
+          .filter(
+            (n) => unf(n) && n.paid && eff[n.id] === "fast" && !route[n.id],
+          )
+          .sort((a, b) => (a.freeH - a.h) / a.paid - (b.freeH - b.h) / b.paid)
+          .forEach((n) => {
+            if (cost() <= budget) return;
+            eff[n.id] = "free";
+            tr.push(
+              `Swapped paid ${n.t} for the free route: +${n.freeH - n.h}h, saves Rs ${n.paid}.`,
+            );
+          });
+        const st = new Set();
+        let tt = nodes.reduce((a, n) => a + rem(n), 0),
+          w = hours ? Math.ceil(tt / hours) : 0;
+        [...nodes]
+          .filter(unf)
+          .sort((a, b) => a.pr - b.pr)
+          .forEach((n) => {
+            if (w <= weeks || !hours) return;
+            st.add(n.id);
+            tt -= rem(n);
+            w = Math.ceil(tt / hours);
+            tr.push(`Marked ${n.t} as stretch to fit ${weeks} weeks.`);
+          });
+        return { weeks: w, cost: cost(), tradeoffs: tr, stretch: st, eff };
+      }
+      let P,
+        sel = null,
+        tab = "Checklist";
+      function replan() {
+        P = plan(S.nodes, S.p.hours, S.p.budget, S.p.weeks, S.route);
+      }
+      /* RENDER */
+      function render() {
+        replan();
+        save();
+        const p = S.p;
+        $("who").textContent = `${p.name} · target: ${p.role || "not set"}`;
+        $("pct").textContent = overall() + "% overall";
+        $("prof").innerHTML = [
+          ["College", p.college],
+          ["Weekly hours", p.hours],
+          ["Budget (INR)", p.budget],
+          ["Deadline", p.weeks && p.weeks + " weeks"],
+          ["GitHub", p.github],
+        ]
+          .map(
+            (r) =>
+              `<div class="row"><span class="m">${r[0]}</span><span>${esc(r[1] || "—")}</span></div>`,
+          )
+          .join("");
+        const f = [
+            p.role,
+            p.hours,
+            p.budget,
+            p.weeks,
+            p.github,
+            S.skills.length,
+          ],
+          c = Math.round((f.filter(Boolean).length / f.length) * 100);
+        $("comp").style.width = c + "%";
+        const miss = [
+          "role",
+          "hours",
+          "budget",
+          "deadline",
+          "GitHub",
+          "skills",
+        ].filter((_, i) => !f[i]);
+        $("nudge").innerHTML = miss.length
+          ? `<a href="#" onclick="openChat();return false">Tell Guide about ${miss[0]}</a>`
+          : "";
+        $("ring").style.strokeDashoffset = 276.5 * (1 - overall() / 100);
+        $("rt").textContent = overall() + "%";
+        if (S.nodes.length) {
+          const b =
+            P.weeks > p.weeks
+              ? ["behind", "b2"]
+              : P.weeks < p.weeks * 0.8
+                ? ["ahead", "b1"]
+                : ["on track", "b1"];
+          $("track").innerHTML = `<span class="badge ${b[1]}">${b[0]}</span>`;
+          $("left").textContent = left() + " items left";
+          $("wk").textContent = `${P.weeks} wks needed / ${p.weeks}`;
+          $("cost").textContent = `Rs ${P.cost} of Rs ${p.budget}`;
+          $("cbar").style.width =
+            Math.min(100, (P.cost / Math.max(1, p.budget)) * 100) + "%";
+        } else {
+          $("track").innerHTML = '<span class="m">No plan yet</span>';
+          ["left", "wk", "cost"].forEach((i) => ($(i).textContent = ""));
+          $("cbar").style.width = "0";
+        }
+        const ph = {};
+        S.nodes.forEach((n) => (ph[n.ph] = ph[n.ph] || []).push(n));
+        $("phases").innerHTML = Object.keys(ph)
+          .map((k) => {
+            const d = ph[k].reduce((a, n) => a + dn(n), 0),
+              t = ph[k].reduce((a, n) => a + tot(n), 0);
+            return `<div class="row" style="margin:4px 0"><span class="m">${k}</span><span class="m">${t ? Math.round((d / t) * 100) : 0}%</span></div><div class="bar"><i style="width:${t ? (d / t) * 100 : 0}%"></i></div>`;
+          })
+          .join("");
+        $("sk").innerHTML = S.skills.length
+          ? S.skills
+              .map((s) => {
+                const v = lvl(s);
+                return `<div class="row" style="margin-bottom:2px"><a href="#" onclick="skillPanel('${s.id}');return false">${esc(s.name)}</a><span class="m">LVL ${v}/${s.tgt} · ${s.ev.length} EVIDENCE</span></div><div class="bar"><i style="width:${v * 20}%"></i></div><div class="bar" style="height:3px;margin-top:2px"><i class="g" style="width:${Math.max(0, s.tgt - v) * 20}%"></i></div>`;
+              })
+              .join("")
+          : '<div class="m">No skills yet. Add one or tell Guide what you know.</div>';
+        drawMap();
+        const nx = [];
+        S.nodes
+          .filter((n) => !locked(n))
+          .forEach((n) =>
+            n.items
+              .filter((i) => !i.done && !i.skip)
+              .forEach((i) => nx.push([n, i])),
+          );
+        $("next").innerHTML =
+          nx
+            .slice(0, 3)
+            .map(([n, i]) =>
+              ck(n, i, '<br><span class="m">' + esc(n.t) + "</span>"),
+            )
+            .join("") ||
+          '<div class="m">Approve a plan to get weekly actions.</div>';
+        $("proj").innerHTML = S.projects.length
+          ? S.projects
+              .map((pr) => {
+                const pd = pr.rub.filter((r) => r.p).length;
+                return `<div class="tilt" style="border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px"><div class="row"><b>${esc(pr.t)}</b><span><select style="width:auto" onchange="mv('${pr.id}',this.value)">${["Idea", "Building", "Needs review", "Verified"].map((o) => `<option ${o === (pr.ver ? "Verified" : pr.st) ? "selected" : ""}>${o}</option>`).join("")}</select> <button onclick="delP('${pr.id}')">Delete</button></span></div><div class="m">${pd}/${pr.rub.length} checks · ${pr.tags.map(esc).join(", ")} · node: ${pr.node || "none"}</div>${pr.rub.map((r, i) => `<label class="ck"><input type="checkbox" style="width:auto" ${r.p ? "checked" : ""} onchange="rub('${pr.id}',${i})"><span>${esc(r.c)}</span></label>`).join("")}<div class="row"><button onclick="signoff('${pr.id}')" ${pr.ver || pr.req ? "disabled" : ""}>Request sign-off</button>${pr.ver ? `<span class="stamp">Verified by ${pr.ver.by}, ${pr.ver.at}</span>` : pr.req ? '<span class="m">awaiting mentor</span>' : ""}</div></div>`;
+              })
+              .join("")
+          : '<div class="m">No projects yet. Add one, or ask Guide to suggest one.</div>';
+        $("ppl").innerHTML = S.rev
+          ? `<div class="row"><span>${esc(S.rev.who)}: ${esc(S.rev.text)}</span><span class="badge ${S.rev.st === "accepted" ? "b1" : "b2"}">${S.rev.st}</span></div>`
+          : '<div class="m">No mentor yet. Use Ask a human in the roadmap.</div>';
+        $("act").innerHTML = S.act.length
+          ? S.act
+              .slice(-6)
+              .reverse()
+              .map((a) => `<div class="row">${esc(a)}</div>`)
+              .join("")
+          : '<div class="m">Nothing logged yet.</div>';
+        $("ctx").innerHTML = [
+          p.role && "role: " + p.role,
+          p.hours && p.hours + " h/wk",
+          p.budget !== "" && p.budget !== undefined && "Rs " + p.budget,
+          S.skills.length + " skills",
+        ]
+          .filter(Boolean)
+          .map((x) => `<span class="badge">${esc(x)}</span>`)
+          .join("");
+        if (sel && $("panel").classList.contains("open")) panel();
+      }
+      function ck(n, i, extra = "") {
+        return `<div class="ck ${i.done ? "d" : ""}"><button class="box" aria-label="toggle" onclick="tog('${n.id}','${i.id}')">${i.done ? '<svg width="16" height="16" viewBox="0 0 16 16"><path class="tick" d="M3 8l3.5 3.5L13 4"/></svg>' : ""}</button><span>${esc(i.text)}${extra}</span></div>`;
+      }
+      function drawMap() {
+        const fl = $("flt").value;
+        if (!S.nodes.length) {
+          $("rm").innerHTML =
+            '<div class="m">No roadmap yet. Ask Guide to build one.</div>';
+          return;
+        }
+        let e = "",
+          g = "";
+        S.nodes.forEach((n) =>
+          n.req.forEach((r) => {
+            const a = POS[r],
+              b = POS[n.id],
+              src = S.nodes.find((q) => q.id === r);
+            if (!a || !b) return;
+            e += `<path class="edge ${src && nPct(src) >= 0.8 ? "on" : ""}" d="${LAY !== "v" ? `M${a[0] + 170},${a[1] + 36}C${a[0] + 195},${a[1] + 36} ${b[0] - 25},${b[1] + 36} ${b[0]},${b[1] + 36}` : `M${a[0] + 85},${a[1] + 72}C${a[0] + 85},${a[1] + 100} ${b[0] + 85},${b[1] - 28} ${b[0] + 85},${b[1]}`}"/>`;
+          }),
+        );
+        S.nodes.forEach((n) => {
+          const d = dn(n),
+            t = tot(n),
+            pc = nPct(n),
+            lk = locked(n),
+            st =
+              tot(n) === 0
+                ? "skp"
+                : pc >= 1
+                  ? "done"
+                  : d > 0 || n.learn
+                    ? "prog"
+                    : "",
+            hid =
+              fl === "Done"
+                ? pc < 1
+                : fl === "Left"
+                  ? pc >= 1
+                  : fl === "In progress"
+                    ? !(d > 0 && pc < 1)
+                    : 0,
+            ic = lk
+              ? "🔒"
+              : st === "done"
+                ? '<path class="tick" d="M0 8l4 4 9-9"/>'
+                : st === "prog"
+                  ? '<circle cx="6" cy="7" r="6" fill="none" stroke="var(--ox)" stroke-width="2"/>'
+                  : '<circle cx="6" cy="7" r="6" fill="none" stroke="var(--slate)" stroke-width="1.5"/>';
+          g += `<g class="node ${st} ${lk ? "lock" : ""} ${hid ? "dim" : ""}" transform="translate(${POS[n.id]})" onclick="openNode('${n.id}')" tabindex="0"><rect class="c" width="170" height="72" rx="10"/><text x="10" y="22">${esc(n.t)}</text><text x="10" y="40" style="fill:var(--slate);font-size:11px">${d} / ${t} done · ${t - d} left${P.stretch.has(n.id) ? " · stretch" : ""}</text><rect x="10" y="52" width="150" height="5" rx="2" fill="var(--line)"/><rect x="10" y="52" width="${150 * pc}" height="5" rx="2" fill="${st === "done" ? "var(--brass)" : "var(--ox)"}" style="transition:width .6s"/><g transform="translate(146,8)">${ic.startsWith("<") ? `<svg x="0" y="0" width="14" height="14" viewBox="0 0 14 14">${ic}</svg>` : `<text font-size="12">${ic}</text>`}</g></g>`;
+        });
+        $("rm").innerHTML =
+          `<svg viewBox="0 0 ${Math.max(800, ...S.nodes.map((n) => (POS[n.id] || [0])[0] + 190))} ${Math.max(250, ...S.nodes.map((n) => (POS[n.id] || [0, 0])[1] + 90))}" style="min-width:680px;width:100%">${e}${g}</svg>`;
+        $("tradeoffs").innerHTML = P.tradeoffs.join("<br>");
+      }
+      function tog(nid, iid) {
+        const n = S.nodes.find((x) => x.id === nid),
+          i = n.items.find((x) => x.id === iid);
+        i.done = i.done ? 0 : 1;
+        S.act.push((i.done ? "Done: " : "Reopened: ") + i.text);
+        if (i.done && nPct(n) >= 1)
+          S.act.push("Finished node: " + n.t + " (unverified)");
+        render();
+      }
+      function openNode(id) {
+        sel = id;
+        tab = "Checklist";
+        $("panel").classList.add("open");
+        panel();
+      }
+      function panel() {
+        const n = S.nodes.find((x) => x.id === sel);
+        if (!n) return;
+        const body = {
+          Checklist: () => {
+            const L = n.items.filter((i) => !i.done),
+              D = n.items.filter((i) => i.done);
+            return `<div class="m">LEFT (${L.length})</div>${L.map((i) => `<div class="ck">${ck(n, i).replace('class="ck "', "")}<button class="x" onclick="skip('${n.id}','${i.id}')">${i.skip ? "Unskip" : "Skip"}</button><button class="x" onclick="rm('${n.id}','${i.id}')">×</button></div>`).join("")}<div class="row"><input id="ni" placeholder="Add an item"><button onclick="addItem('${n.id}')">Add</button></div><div class="m">DONE (${D.length})</div>${D.map((i) => ck(n, i)).join("")}${locked(n) ? `<button onclick="unlock('${n.id}')">Unlock anyway</button>` : ""}`;
+          },
+          Overview: () => {
+            const r = P.eff[n.id],
+              h = r === "free" && n.freeH ? n.freeH : n.h;
+            return `${n.rv ? `<p><span class="badge b1">${esc(n.rv)}</span></p>` : ""}<p><b>Why it matters:</b> appears in most data-role postings <span class="badge">Estimated, verify</span></p><p><b>Why this for you:</b> your ${esc(S.skills[0] ? S.skills[0].name : "background")} evidence is the starting point.</p><p>Effort: ${h}h, ${S.p.hours ? Math.ceil(h / S.p.hours) : "?"} weeks at ${S.p.hours} h/wk. Cost: Rs ${r === "fast" ? n.paid : 0}.</p>${n.paid ? `<div class="tabs"><button class="${r === "free" ? "p" : ""}" onclick="route('${n.id}','free')">Free</button><button class="${r === "fast" ? "p" : ""}" onclick="route('${n.id}','fast')">Fast-track (Rs ${n.paid})</button></div>` : '<div class="m">Only a free route exists.</div>'}`;
+          },
+          Project: () => {
+            const ps = S.projects.filter((p) => p.node === n.id);
+            return (
+              (ps
+                .map(
+                  (p) =>
+                    `<div class="row"><b>${esc(p.t)}</b><span class="m">${p.rub.filter((r) => r.p).length}/${p.rub.length} checks</span></div>`,
+                )
+                .join("") || '<div class="m">No linked project.</div>') +
+              '<div class="tabs">' +
+              S.projects
+                .filter((p) => p.node !== n.id)
+                .map(
+                  (p) =>
+                    `<button onclick="link('${p.id}','${n.id}')">Link ${esc(p.t)}</button>`,
+                )
+                .join("") +
+              "</div>"
+            );
+          },
+          Resources: () => resTab(n),
+          Seniors: () => senBoard(n),
+          Notes: () =>
+            `<textarea rows="6" onchange="note('${n.id}',this.value)">${esc(n.notes)}</textarea>`,
+        };
+        $("panel").innerHTML =
+          `<div class="row"><h2>${esc(n.t)}</h2><button onclick="$('panel').classList.remove('open')">Close</button></div><div class="m">${dn(n)} / ${tot(n)} done · ${tot(n) - dn(n)} left · ${nPct(n) >= 1 ? (projVer(n) ? "done (verified)" : "done (unverified)") : locked(n) ? "locked" : "open"}</div><div class="tabs"><button class="${n.learn ? "p" : ""}" onclick="stat('${n.id}','learn')">Learning</button><button onclick="stat('${n.id}','done')">Mark done</button><button onclick="stat('${n.id}','skip')">Skip node</button></div><div class="tabs">${Object.keys(
+            body,
+          )
+            .map(
+              (t) =>
+                `<button class="${t === tab ? "on" : ""}" onclick="tab='${t}';panel()">${t}</button>`,
+            )
+            .join("")}</div>${body[tab]()}`;
+      }
+      const N = (id) => S.nodes.find((x) => x.id === id);
+      function skip(a, b) {
+        const i = N(a).items.find((x) => x.id === b);
+        i.skip = i.skip ? 0 : 1;
+        render();
+      }
+      function rm(a, b) {
+        N(a).items = N(a).items.filter((x) => x.id !== b);
+        render();
+      }
+      function addItem(a) {
+        const v = $("ni").value.trim();
+        if (!v) return;
+        N(a).items.push({ id: uid(), text: v, done: 0, skip: 0 });
+        render();
+      }
+      function unlock(a) {
+        N(a).unl = 1;
+        S.act.push("Unlocked " + N(a).t);
+        render();
+      }
+      function route(a, r) {
+        S.route[a] = r;
+        render();
+      }
+      function note(a, v) {
+        N(a).notes = v;
+        save();
+      }
+      function link(p, n) {
+        S.projects.find((x) => x.id === p).node = n;
+        render();
+      }
+      function skillPanel(id) {
+        const s = S.skills.find((x) => x.id === id);
+        sel = null;
+        $("panel").classList.add("open");
+        $("panel").innerHTML =
+          `<div class="row"><h2>${esc(s.name)}</h2><button onclick="$('panel').classList.remove('open')">Close</button></div><div class="m">LVL ${lvl(s)} of ${s.tgt} · ${esc(s.cat)}</div><p>${nextHint(s) || "At target."}</p><div class="m">EVIDENCE</div>${s.ev.map((e) => `<div>${esc(e)}</div>`).join("") || '<div class="m">none yet</div>'}<div class="m" style="margin-top:10px">LINKED NODES</div>${
+            S.nodes
+              .filter((n) => n.sk.includes(s.name))
+              .map(
+                (n) =>
+                  `<div><a href="#" onclick="openNode('${n.id}');return false">${esc(n.t)}</a></div>`,
+              )
+              .join("") || '<div class="m">none</div>'
+          }<button style="margin-top:12px" onclick="S.skills=S.skills.filter(x=>x.id!=='${id}');$('panel').classList.remove('open');render()">Delete skill</button>`;
+      }
+      /* FORMS */
+      function form(title, fields, ok) {
+        $("mf").innerHTML =
+          `<h2>${title}</h2>` +
+          fields
+            .map(
+              (f) =>
+                `<label class="f"><span class="m">${f.l}</span>${f.o ? `<select name="${f.k}">${f.o.map((o) => `<option>${o}</option>`).join("")}</select>` : `<input name="${f.k}" type="${f.t || "text"}" value="${f.v || ""}">`}</label>`,
+            )
+            .join("") +
+          '<div class="row"><button type="button" onclick="$(\'modal\').classList.remove(\'open\')">Cancel</button><button class="p">Save</button></div>';
+        $("mf").onsubmit = (e) => {
+          e.preventDefault();
+          const d = Object.fromEntries(new FormData($("mf")));
+          $("modal").classList.remove("open");
+          ok(d);
+        };
+        $("modal").classList.add("open");
+      }
+      function addSkill(pre) {
+        form(
+          "Add skill",
+          [
+            { k: "name", l: "Name", v: pre || "" },
+            { k: "cat", l: "Category", o: ["Core", "ML", "Data", "Cloud"] },
+            { k: "lvl", l: "Current level 0-5", t: "number", v: 0 },
+            { k: "tgt", l: "Target level 0-5", t: "number", v: 4 },
+            { k: "ev", l: "How I know it (repo, cert, project, mentor, self)" },
+            { k: "url", l: "Link (optional)" },
+          ],
+          (d) => {
+            if (!d.name) return;
+            S.skills.push({
+              id: uid(),
+              name: d.name,
+              cat: d.cat,
+              lvl: +d.lvl || 0,
+              tgt: +d.tgt || 4,
+              ev: d.ev ? [d.ev + (d.url ? " (" + d.url + ")" : "")] : [],
+            });
+            S.act.push("Added skill " + d.name);
+            render();
+          },
+        );
+      }
+      function addProject(pre) {
+        form(
+          "Add project",
+          [
+            { k: "t", l: "Title", v: pre || "" },
+            { k: "tags", l: "Tech tags (comma separated)" },
+            { k: "repo", l: "Repo URL" },
+            { k: "sk", l: "Linked skills (comma separated)" },
+            {
+              k: "node",
+              l: "Linked node",
+              o: ["none", ...S.nodes.map((n) => n.id)],
+            },
+            {
+              k: "rub",
+              l: "Rubric checks (comma separated)",
+              v: "Runs end to end, Tested, Documented",
+            },
+            { k: "st", l: "Status", o: ["Idea", "Building", "Needs review"] },
+          ],
+          (d) => {
+            if (!d.t) return;
+            S.projects.push({
+              id: uid(),
+              t: d.t,
+              tags: d.tags
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean),
+              st: d.st,
+              rub: d.rub
+                .split(",")
+                .map((c) => ({ c: c.trim(), p: 0 }))
+                .filter((r) => r.c),
+              sk: d.sk
+                .split(",")
+                .map((x) => x.trim())
+                .filter(Boolean),
+              node: d.node === "none" ? null : d.node,
+              ver: null,
+              req: false,
+            });
+            S.act.push("Added project " + d.t);
+            render();
+          },
+        );
+      }
+      const PS = ["Idea", "Building", "Needs review", "Verified"];
+      function mv(id, v) {
+        const p = S.projects.find((x) => x.id === id);
+        if (v !== "Verified") p.st = v;
+        render();
+      }
+      function delP(id) {
+        S.projects = S.projects.filter((x) => x.id !== id);
+        render();
+      }
+      function rub(id, i) {
+        const p = S.projects.find((x) => x.id === id);
+        p.rub[i].p = p.rub[i].p ? 0 : 1;
+        render();
+      }
+      function signoffOld(id) {
+        const p = S.projects.find((x) => x.id === id);
+        p.req = true;
+        p.st = "Needs review";
+        S.act.push("Requested sign-off: " + p.t);
+        render();
+        setTimeout(() => {
+          p.ver = { by: "Ria K.", at: new Date().toLocaleDateString() };
+          p.rub.forEach((r) => (r.p = 1));
+          p.req = false;
+          S.act.push("Verified by Ria K.: " + p.t);
+          render();
+        }, 1800);
+      }
+      function startOver() {
+        blank();
+        $("log").innerHTML = "";
+        render();
+        openChat();
+      }
+      function reseed() {
+        seed();
+        render();
+      }
+      /* CHAT: one question at a time */
+      function say(h, c = "") {
+        const b = document.createElement("div");
+        b.className = "b " + c;
+        b.innerHTML = h;
+        $("log").appendChild(b);
+        $("log").scrollTop = 1e9;
+        return b;
+      }
+      function chips(b, arr) {
+        const c = document.createElement("div");
+        c.className = "chips";
+        arr.forEach(([t, fn, pp]) => {
+          const x = document.createElement("button");
+          if (pp) x.className = "p";
+          x.textContent = t;
+          x.onclick = () => {
+            c.remove();
+            fn();
+          };
+          c.appendChild(x);
+        });
+        b.appendChild(c);
+      }
+      const Q = [
+        [
+          "What role are you aiming for?",
+          ["Data Scientist", "Backend Developer", "Product Analyst"],
+        ],
+        ["How many hours a week can you give this?", ["5", "8", "12"]],
+        ["What is your budget in rupees?", ["0", "2000", "5000"]],
+        ["How many weeks until your deadline?", ["8", "12", "20"]],
+      ];
+      function askQ(i) {
+        chips(
+          say(Q[i][0]),
+          Q[i][1].map((t) => [t, () => answer(t)]),
+        );
+      }
+      function openChat() {
+        $("chat").classList.add("open");
+        $("launch").style.display = "none";
+        if (!$("log").children.length) {
+          say("I am Guide. I ask one question at a time.");
+          next();
+        }
+      }
+      function closeChat() {
+        $("chat").classList.remove("open");
+        $("launch").style.display = "";
+      }
+      function next() {
+        const p = S.p;
+        if (!p.role) return askQ(0);
+        if (!p.hours) return askQ(1);
+        if (!p.budgetSet && !p.budget) return askQ(2);
+        if (!p.weeks) return askQ(3);
+        if (!S.nodes.length) return propose();
+        say(
+          "Your plan is loaded. Try: “I finished SQL”, “I only have Rs 2000”, “10 hours a week”, “add a project on churn”.",
+        );
+      }
+      function answer(t) {
+        say(esc(t), "u");
+        handle(t);
+      }
+      function send(e) {
+        e.preventDefault();
+        const v = $("in").value.trim();
+        if (!v) return;
+        $("in").value = "";
+        answer(v);
+      }
+      const num = (t) => {
+        const m = t.replace(/,/g, "").match(/\d+/);
+        return m ? +m[0] : null;
+      };
+      let strike = 0;
+      function handle(t) {
+        const l = t.toLowerCase(),
+          p = S.p,
+          n = num(t);
+        if (!p.role) {
+          p.role = t;
+          render();
+          if (/data sci/i.test(t))
+            say(
+              "Analytics-leaning or ML-leaning? That changes the stepping-stone role. I will plan for ML-leaning.",
+            );
+          return next();
+        }
+        if (!p.hours) {
+          if (!n) return say("Give hours per week as a number.");
+          p.hours = n;
+          render();
+          if (n < 6)
+            say(
+              `At ${n} hours a week this path will be tight, so something may need to be cut.`,
+            );
+          return next();
+        }
+        if (!p.budgetSet && !p.budget) {
+          if (n === null) return say("Give a rupee amount, or 0.");
+          p.budget = n;
+          p.budgetSet = 1;
+          render();
+          return next();
+        }
+        if (!p.weeks) {
+          if (!n) return say("Give weeks as a number.");
+          p.weeks = n;
+          render();
+          return next();
+        }
+        if (/rs|budget|only have/.test(l) && n !== null) {
+          const before = P.cost;
+          p.budget = n;
+          render();
+          return say(
+            `Budget is now Rs ${n}. ${P.tradeoffs[0] || "Current plan fits."} ${P.weeks > p.weeks ? "This now runs past your deadline, so some nodes are stretch." : ""}`,
+          );
+        }
+        if (/hour/.test(l) && n) {
+          p.hours = n;
+          render();
+          return say(
+            `Now ${n} h/wk: ${P.weeks} weeks needed against ${p.weeks}.`,
+          );
+        }
+        const m = S.nodes.find(
+          (x) =>
+            /finish|done|completed/.test(l) &&
+            (l.includes(x.sk[0].toLowerCase()) ||
+              l.includes(x.t.toLowerCase().split(" ")[0])),
+        );
+        if (m) {
+          m.items.forEach((i) => {
+            if (!i.skip) i.done = 1;
+          });
+          S.act.push("Finished " + m.t + " (unverified)");
+          render();
+          return say(
+            `Ticked all of ${m.t}. It stays unverified until a mentor signs off.`,
+          );
+        }
+        if (/add a project/.test(l))
+          return addProject(t.replace(/.*project (on|about)?/i, ""));
+        if (/human|mentor/.test(l)) return askHuman();
+        strike++;
+        if (strike >= 2) {
+          say("We keep circling. Want a person to look?");
+          return chips($("log").lastChild, [["Ask a human", askHuman, 1]]);
+        }
+        say(
+          "I can change budget, hours, tick off finished topics, or add a project. Which?",
+        );
+      }
+      function propose() {
+        const pl = plan(
+          CAT.map((c) => mk(c)),
+          S.p.hours,
+          S.p.budget,
+          S.p.weeks,
+          {},
+        );
+        const b = say(
+          `<b>Skills analysis:</b> solid Python, thin SQL and ML.<br><b>Market outlook:</b> SQL and Python lead data postings <span class="badge">Estimated, verify</span><br><b>Roadmap:</b> ${CAT.length} phases, about ${pl.weeks} weeks, Rs ${pl.cost}.<br><b>Project:</b> price-anomaly detector on your repo.${pl.tradeoffs.length ? "<br><b>Trade-offs:</b> " + pl.tradeoffs.join(" ") : ""}`,
+        );
+        chips(b, [["Approve plan", reveal, 1]]);
+      }
+      function reveal() {
+        say("Approved. Building your roadmap.");
+        S.act.push("Approved roadmap");
+        const t0 = ["Python", "SQL", "Stats", "ML", "DL", "Projects"];
+        S.skills = t0.map((n, i) => ({
+          id: uid(),
+          name: n,
+          cat: i > 2 && i < 5 ? "ML" : "Core",
+          lvl: 0,
+          tgt: 4,
+          ev: [],
+        }));
+        S.nodes = [];
+        let i = 0;
+        location.hash = "roadmap";
+        const t = setInterval(() => {
+          S.nodes.push(mk(CAT[i]));
+          i++;
+          render();
+          if (i >= CAT.length) {
+            clearInterval(t);
+            say(
+              "Done. Click a node to tick items, or tell me what you finished.",
+            );
+          }
+        }, 450);
+      }
+      function askHumanOld() {
+        say("Review requested. A mentor will reply here.");
+        S.rev = { who: "Ria K.", text: "pending", st: "pending" };
+        S.act.push("Requested mentor review");
+        render();
+        setTimeout(() => {
+          S.rev.text =
+            "Deprioritise deep learning; it is unrealistic for your timeline.";
+          render();
+          chips(
+            say(
+              "<b>Ria K. (alumna)</b> suggests: deprioritise Deep learning, since it is unrealistic for your timeline.",
+            ),
+            [
+              [
+                "Accept",
+                () => {
+                  S.rev.st = "accepted";
+                  const d = N("dl");
+                  if (d) d.pr = 0;
+                  S.act.push("Accepted mentor suggestion");
+                  render();
+                  say(
+                    "Followed Ria. Deep learning is now the first node dropped if time is short.",
+                  );
+                },
+                1,
+              ],
+              [
+                "Dismiss",
+                () => {
+                  S.rev.st = "dismissed";
+                  render();
+                },
+              ],
+            ],
+          );
+        }, 1800);
+      }
+      /* MENTOR LOOP: reviews and sign-offs live in localStorage 'ct_rv' and sync across tabs via BroadcastChannel. */
+      const BC = new BroadcastChannel("ct"),
+        RV = () => {
+          try {
+            return JSON.parse(localStorage.getItem("ct_rv") || "{}");
+          } catch (e) {
+            return {};
+          }
+        },
+        setRV = (o) => {
+          try {
+            localStorage.setItem("ct_rv", JSON.stringify(o));
+          } catch (e) {}
+          BC.postMessage(1);
+          pushRV(o);
+        };
+      const isMentor = () =>
+        /\/mentor\/?$/.test(location.pathname) ||
+        (() => {
+          try {
+            return sessionStorage.getItem("ctm") === "1";
+          } catch (e) {
+            return false;
+          }
+        })();
+      function toggleMentor() {
+        if (/\/mentor\/?$/.test(location.pathname)) {
+          location.href = "/";
+          return;
+        }
+        try {
+          sessionStorage.setItem("ctm", isMentor() ? "0" : "1");
+        } catch (e) {}
+        location.reload();
+      }
+      function askHuman() {
+        openChat();
+        const id = uid(),
+          o = RV();
+        o[id] = {
+          id,
+          kind: "review",
+          status: "open",
+          student: S.p.name,
+          role: S.p.role,
+          nodes: S.nodes.map((n) => ({
+            id: n.id,
+            t: n.t,
+            pc: Math.round(nPct(n) * 100),
+            a: "",
+            text: "",
+            alt: "",
+          })),
+          verdict: "",
+          mnote: "",
+          mentor: "",
+        };
+        setRV(o);
+        S.rev = { who: "Mentor", text: "pending", st: "pending", id };
+        S.act.push("Requested mentor review");
+        render();
+        chips(
+          say(
+            "Review sent. Mentor link: " +
+              location.origin +
+              "/mentor (or use Mentor view in a second tab). Use the fallback to simulate a reply.",
+          ),
+          [["Simulate mentor", () => simRev(id)]],
+        );
+      }
+      function simRev(id) {
+        const o = RV(),
+          r = o[id];
+        r.nodes.forEach((n) => (n.a = n.id === "dl" ? "flag" : "approve"));
+        r.verdict = "Needs changes";
+        r.mnote =
+          "Deprioritise deep learning; it is unrealistic for your timeline.";
+        r.mentor = "Ria K.";
+        r.status = "answered";
+        setRV(o);
+        studentSync();
+      }
+      function signoff(id) {
+        openChat();
+        const p = S.projects.find((x) => x.id === id),
+          o = RV(),
+          k = uid();
+        o[k] = {
+          id: k,
+          kind: "signoff",
+          status: "open",
+          pid: id,
+          title: p.t,
+          student: S.p.name,
+          rub: p.rub.map((r) => ({ c: r.c, p: 0 })),
+          mentor: "",
+        };
+        setRV(o);
+        p.req = true;
+        p.st = "Needs review";
+        S.act.push("Requested sign-off: " + p.t);
+        render();
+        chips(
+          say(
+            "Sign-off requested. The mentor ticks each rubric check in Mentor view, or use the fallback.",
+          ),
+          [
+            [
+              "Simulate mentor",
+              () => {
+                const q = RV();
+                q[k].rub.forEach((r) => (r.p = 1));
+                q[k].status = "done";
+                q[k].mentor = "Ria K.";
+                setRV(q);
+                studentSync();
+              },
+            ],
+          ],
+        );
+      }
+      function studentSync() {
+        const o = RV();
+        Object.values(o).forEach((r) => {
+          if (r.kind === "review" && r.status === "answered" && !r.seen) {
+            r.seen = 1;
+            setRV(o);
+            S.rev = {
+              who: r.mentor,
+              text: r.verdict + ": " + r.mnote,
+              st: "pending",
+              id: r.id,
+            };
+            r.nodes.forEach((n) => {
+              const x = N(n.id);
+              if (x && n.a)
+                x.rv =
+                  n.a === "approve"
+                    ? "Reviewed by " + r.mentor
+                    : n.a === "flag"
+                      ? r.mentor + " flags: unrealistic for timeline"
+                      : r.mentor + " suggests: " + (n.text || n.alt);
+            });
+            S.act.push("Mentor feedback from " + r.mentor);
+            render();
+            const sg = r.nodes
+              .filter((n) => n.a && n.a !== "approve")
+              .map(
+                (n) =>
+                  n.t +
+                  (n.a === "flag"
+                    ? " (flagged)"
+                    : " (change: " + (n.text || n.alt) + ")"),
+              )
+              .join("; ");
+            chips(
+              say(
+                `<b>${esc(r.mentor)}</b>: ${esc(r.verdict)}. ${esc(r.mnote)}${sg ? "<br>" + esc(sg) : ""}`,
+              ),
+              [
+                [
+                  "Accept",
+                  () => {
+                    r.nodes.forEach((n) => {
+                      const x = N(n.id);
+                      if (!x) return;
+                      if (n.a === "flag") x.pr = 0;
+                      if (n.a === "suggest" && n.alt === "Switch to free route")
+                        S.route[x.id] = "free";
+                    });
+                    S.rev.st = "accepted";
+                    S.act.push("Accepted feedback from " + r.mentor);
+                    render();
+                    say(
+                      `Followed ${esc(r.mentor)}. ${esc(P.tradeoffs[0] || "Plan re-run; flagged nodes are first to drop if time is short.")}`,
+                    );
+                  },
+                  1,
+                ],
+                [
+                  "Dismiss",
+                  () => {
+                    S.rev.st = "dismissed";
+                    render();
+                  },
+                ],
+              ],
+            );
+          }
+          if (r.kind === "signoff" && r.status === "done" && !r.seen) {
+            r.seen = 1;
+            setRV(o);
+            const p = S.projects.find((x) => x.id === r.pid);
+            if (p) {
+              p.rub = r.rub;
+              p.ver = { by: r.mentor, at: new Date().toLocaleDateString() };
+              p.req = false;
+              S.act.push("Verified by " + r.mentor + ": " + p.t);
+              render();
+            }
+          }
+        });
+      }
+      BC.onmessage = () => {
+        if (!isMentor()) studentSync();
+      };
+      function rvCard(r) {
+        return `<section class="s12"><h2>Roadmap review: ${esc(r.student)}, target ${esc(r.role || "not set")}</h2>${r.nodes
+          .map(
+            (n) =>
+              `<div class="row"><span>${esc(n.t)} <span class="m">${n.pc}% done</span></span><span>${[
+                ["approve", "Approve"],
+                ["suggest", "Suggest change"],
+                ["flag", "Flag unrealistic"],
+              ]
+                .map(
+                  ([a, l]) =>
+                    `<button class="${n.a === a ? "p" : ""}" onclick="mA('${r.id}','${n.id}','${a}')">${l}</button>`,
+                )
+                .join(
+                  " ",
+                )}</span></div>${n.a === "suggest" ? `<div class="row"><input placeholder="Suggested change" value="${esc(n.text)}" onchange="mT('${r.id}','${n.id}',this.value)"><select onchange="mAlt('${r.id}','${n.id}',this.value)">${["", "Switch to free route"].map((o) => `<option ${n.alt === o ? "selected" : ""}>${o}</option>`).join("")}</select></div>` : ""}`,
+          )
+          .join(
+            "",
+          )}<div class="row"><select id="v${r.id}"><option>Approved</option><option>Needs changes</option><option>Not feasible</option></select></div><input id="n${r.id}" placeholder="Overall note"><div class="row"><span></span><button class="p" onclick="mSend('${r.id}')">Send review</button></div></section>`;
+      }
+      function soCard(r) {
+        const ok = r.rub.every((x) => x.p);
+        return `<section class="s12"><h2>Sign-off: ${esc(r.title)}</h2><div class="m">${esc(r.student)} asks you to verify each rubric check.</div>${r.rub.map((x, i) => `<label class="ck"><input type="checkbox" style="width:auto" ${x.p ? "checked" : ""} onchange="mR('${r.id}',${i})"><span>${esc(x.c)}</span></label>`).join("")}<div class="row"><span></span><button class="p" ${ok ? "" : "disabled"} onclick="mV('${r.id}')">Verify project</button></div></section>`;
+      }
+      const mput = (f) => {
+          const o = RV();
+          f(o);
+          setRV(o);
+          mdraw();
+        },
+        mname = () => {
+          const v = ($("mn") || {}).value || "Mentor";
+          try {
+            sessionStorage.setItem("ctn", v);
+          } catch (e) {}
+          return v;
+        };
+      const mA = (i, n, a) =>
+          mput((o) => (o[i].nodes.find((x) => x.id === n).a = a)),
+        mT = (i, n, v) =>
+          mput((o) => (o[i].nodes.find((x) => x.id === n).text = v)),
+        mAlt = (i, n, v) =>
+          mput((o) => (o[i].nodes.find((x) => x.id === n).alt = v)),
+        mR = (i, k) => mput((o) => (o[i].rub[k].p = o[i].rub[k].p ? 0 : 1));
+      function mSend(i) {
+        const nm = mname(),
+          v = $("v" + i).value,
+          t = $("n" + i).value;
+        mput((o) => {
+          const r = o[i];
+          r.mentor = nm;
+          r.verdict = v;
+          r.mnote = t;
+          r.status = "answered";
+        });
+      }
+      function mV(i) {
+        const nm = mname();
+        mput((o) => {
+          o[i].mentor = nm;
+          o[i].status = "done";
+        });
+      }
+      function mentorView() {
+        document.body.style.display = "block";
+        let nm = "";
+        try {
+          nm = sessionStorage.getItem("ctn") || "";
+        } catch (e) {}
+        window.mdraw = () => {
+          const L = Object.values(RV()).filter((r) => r.status === "open");
+          document.body.innerHTML = `<header><b>CareerTrace: Mentor view</b><span class="sp"></span><input id="mn" placeholder="Your display name" value="${esc(nm)}" style="width:200px" onchange="nm=this.value;mname()"><button onclick="toggleMentor()" style="color:#0E1726">Back to student</button></header><main style="grid-template-columns:1fr">${L.length ? L.map((r) => (r.kind === "review" ? rvCard(r) : soCard(r))).join("") : '<section class="s12"><h2>No open requests</h2><div class="m">Use Ask a human or Request sign-off in the student tab. This list updates live.</div></section>'}</main>`;
+        };
+        mdraw();
+        BC.onmessage = () => mdraw();
+      }
+      document.addEventListener("mousemove", (e) => {
+        if (
+          innerWidth < 768 ||
+          matchMedia("(prefers-reduced-motion:reduce)").matches
+        )
+          return;
+        document.querySelectorAll(".tilt").forEach((c) => {
+          const r = c.getBoundingClientRect();
+          if (
+            e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom
+          ) {
+            c.style.transform = "";
+            return;
+          }
+          c.style.transform = `perspective(900px) rotateX(${-((e.clientY - r.top) / r.height - 0.5) * 3}deg) rotateY(${((e.clientX - r.left) / r.width - 0.5) * 3}deg)`;
+        });
+      });
+      /* RESOURCES + COMMUNITY (seeded demo data) */
+      const CRS = [
+        {
+          id: "c1",
+          t: "Stanford CS229",
+          pv: "Stanford",
+          u: "https://cs229.stanford.edu",
+          c: 0,
+          h: 75,
+          tier: "free",
+          sk: ["ML", "Stats"],
+          cv: 4,
+          lv: "Advanced",
+        },
+        {
+          id: "c2",
+          t: "Stanford CS231n",
+          pv: "Stanford",
+          u: "https://cs231n.stanford.edu",
+          c: 0,
+          h: 60,
+          tier: "free",
+          sk: ["DL"],
+          cv: 4,
+          lv: "Advanced",
+        },
+        {
+          id: "c3",
+          t: "Machine Learning Specialization",
+          pv: "DeepLearning.AI / Coursera",
+          u: "https://www.coursera.org/specializations/machine-learning-introduction",
+          c: 4500,
+          h: 60,
+          tier: "paid",
+          sk: ["ML"],
+          cv: 4,
+          lv: "Intermediate",
+        },
+        {
+          id: "c4",
+          t: "Machine Learning Specialization (audit)",
+          pv: "Coursera",
+          u: "https://www.coursera.org/specializations/machine-learning-introduction",
+          c: 0,
+          h: 60,
+          tier: "free",
+          sk: ["ML"],
+          cv: 2,
+          lv: "Intermediate",
+        },
+        {
+          id: "c5",
+          t: "Practical Deep Learning",
+          pv: "fast.ai",
+          u: "https://course.fast.ai",
+          c: 0,
+          h: 55,
+          tier: "free",
+          sk: ["DL", "ML"],
+          cv: 3,
+          lv: "Intermediate",
+        },
+        {
+          id: "c6",
+          t: "Neural Networks: Zero to Hero",
+          pv: "Andrej Karpathy",
+          u: "https://karpathy.ai/zero-to-hero.html",
+          c: 0,
+          h: 20,
+          tier: "free",
+          sk: ["DL"],
+          cv: 3,
+          lv: "Intermediate",
+        },
+        {
+          id: "c7",
+          t: "Hugging Face Course",
+          pv: "Hugging Face",
+          u: "https://huggingface.co/learn",
+          c: 0,
+          h: 25,
+          tier: "free",
+          sk: ["DL", "ML"],
+          cv: 3,
+          lv: "Intermediate",
+        },
+        {
+          id: "c8",
+          t: "Probability and Statistics (certificate exam)",
+          pv: "NPTEL (IIT)",
+          u: "https://nptel.ac.in",
+          c: 1000,
+          h: 40,
+          tier: "cert",
+          sk: ["Stats"],
+          cv: 3,
+          lv: "Beginner",
+        },
+        {
+          id: "c9",
+          t: "SQL Tutorial",
+          pv: "Mode",
+          u: "https://mode.com/sql-tutorial",
+          c: 0,
+          h: 20,
+          tier: "free",
+          sk: ["SQL"],
+          cv: 2,
+          lv: "Beginner",
+        },
+        {
+          id: "c10",
+          t: "Pandas micro-course",
+          pv: "Kaggle Learn",
+          u: "https://www.kaggle.com/learn",
+          c: 0,
+          h: 10,
+          tier: "free",
+          sk: ["Python"],
+          cv: 2,
+          lv: "Beginner",
+        },
+        {
+          id: "c11",
+          t: "Python for Everybody",
+          pv: "Univ. of Michigan",
+          u: "https://www.py4e.com",
+          c: 0,
+          h: 30,
+          tier: "free",
+          sk: ["Python"],
+          cv: 3,
+          lv: "Beginner",
+        },
+        {
+          id: "c12",
+          t: "Professional Data Engineer",
+          pv: "Google Cloud",
+          u: "https://cloud.google.com/learn/certification",
+          c: 15000,
+          h: 40,
+          tier: "cert",
+          sk: ["SQL", "ML"],
+          cv: 5,
+          lv: "Advanced",
+        },
+        {
+          id: "c13",
+          t: "Machine Learning Specialty",
+          pv: "AWS",
+          u: "https://aws.amazon.com/certification/",
+          c: 25000,
+          h: 50,
+          tier: "cert",
+          sk: ["ML"],
+          cv: 5,
+          lv: "Advanced",
+        },
+        {
+          id: "c14",
+          t: "Data Scientist Associate (DP-100)",
+          pv: "Microsoft Azure",
+          u: "https://learn.microsoft.com/credentials/",
+          c: 14000,
+          h: 40,
+          tier: "cert",
+          sk: ["ML"],
+          cv: 4,
+          lv: "Intermediate",
+        },
+      ];
+      const PEERS = [
+        { n: "Isha R.", c: "NSUT", h: 6, g: "Analyst internship" },
+        { n: "Kabir S.", c: "IIIT-D", h: 10, g: "ML research" },
+        { n: "Meera T.", c: "DTU", h: 8, g: "Data science role" },
+        { n: "Rohan P.", c: "JMI", h: 5, g: "Placement prep" },
+        { n: "Sana A.", c: "IGDTUW", h: 9, g: "Kaggle medal" },
+        { n: "Dev K.", c: "BITS", h: 7, g: "Backend to data" },
+      ];
+      const GRP = [
+        {
+          id: "g1",
+          t: "SQL Sprint",
+          node: "sql",
+          m: [0, 2, 3],
+          when: "Thu 7 pm",
+          open: 1,
+        },
+        {
+          id: "g2",
+          t: "Stats Study Circle",
+          node: "st",
+          m: [1, 4],
+          when: "Sat 11 am",
+          open: 1,
+        },
+        {
+          id: "g3",
+          t: "ML from Scratch",
+          node: "ml",
+          m: [1, 2, 4, 5],
+          when: "Sun 6 pm",
+          open: 0,
+        },
+        {
+          id: "g4",
+          t: "Pandas Practice",
+          node: "py",
+          m: [0, 3, 5],
+          when: "Wed 8 pm",
+          open: 1,
+        },
+      ];
+      let R = { tier: "All", sk: "All", max: "", sel: {}, ex: null };
+      const defNode = (c) =>
+          (S.nodes.find((n) => n.sk.some((s) => c.sk.includes(s))) || {}).id,
+        added = (cid) =>
+          S.nodes.some((n) => n.items.some((i) => i.cid === cid));
+      function rsrc() {
+        const L = CRS.filter(
+          (c) =>
+            (R.tier === "All" || c.tier === R.tier) &&
+            (R.sk === "All" || c.sk.includes(R.sk)) &&
+            (R.max === "" || c.c <= +R.max),
+        );
+        $("rcards").innerHTML =
+          L.map((c) => {
+            const gap = S.skills
+                .filter((s) => c.sk.includes(s.name))
+                .map(
+                  (s) =>
+                    s.name +
+                    ": knows " +
+                    know(s) +
+                    " of " +
+                    total(s) +
+                    " elements",
+                )
+                .join(", "),
+              over = S.p.budget && c.c > S.p.budget,
+              sel = R.sel[c.id] || defNode(c) || "";
+            return `<div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div class="row" style="margin-top:0"><b>${esc(c.t)}</b><span class="badge ${c.tier === "free" ? "b1" : ""}">${c.tier}</span></div><div class="m">${esc(c.pv)} · ${c.lv}</div><div class="m">Rs ${c.c} · ${c.h}h · credential ${"●".repeat(c.cv)}${"○".repeat(5 - c.cv)}</div><div class="m">Closes: ${esc(gap || c.sk.join(", "))}</div>${over ? '<div class="m" style="color:var(--ox)">Over your Rs ' + S.p.budget + " budget</div>" : ""}<div class="row"><a href="${c.u}" target="_blank" rel="noopener">Open</a><span>${S.nodes.length ? `<select style="width:auto" onchange="R.sel['${c.id}']=this.value">${S.nodes.map((n) => `<option value="${n.id}" ${n.id === sel ? "selected" : ""}>${esc(n.t)}</option>`).join("")}</select> <button ${added(c.id) ? "disabled" : ""} onclick="addC('${c.id}')">${added(c.id) ? "Added" : "Add to checklist"}</button>` : '<span class="m">Build a roadmap first</span>'}</span></div></div>`;
+          }).join("") || '<div class="m">No courses match these filters.</div>';
+      }
+      function addC(id) {
+        const c = CRS.find((x) => x.id === id),
+          n = N(R.sel[id] || defNode(c));
+        if (!n || added(id)) return;
+        n.items.push({
+          id: uid(),
+          text: "Course: " + c.t,
+          done: 0,
+          skip: 0,
+          cid: id,
+        });
+        S.act.push("Added " + c.t + " to " + n.t);
+        render();
+      }
+      const inG = (id) => (S.joined || []).includes(id);
+      function comm() {
+        const av = (n, i) =>
+          `<span title="${esc(n)}" style="display:inline-flex;width:26px;height:26px;border-radius:50%;background:${i % 2 ? "var(--slate)" : "var(--brass)"};color:#fff;font-size:11px;align-items:center;justify-content:center;margin-right:-6px;border:2px solid var(--paper)">${esc(n.slice(0, 2))}</span>`;
+        const f = S.nodes
+          .filter((n) => !locked(n) && nPct(n) < 1)
+          .map((n) => ({
+            n,
+            g: GRP.find((g) => g.node === n.id && g.open && !inG(g.id)),
+          }))
+          .find((x) => x.g);
+        $("fp").innerHTML = f
+          ? `<div class="row" style="justify-content:flex-start"><span>${f.g.m.length} people are on ${esc(f.n.t)} this week. Join ${esc(f.g.t)}?</span><button class="p" onclick="join('${f.g.id}')">Join</button></div>`
+          : '<div class="m">No open group matches your current node.</div>';
+        $("grps").innerHTML = GRP.map((g) => {
+          const nd = N(g.node),
+            j = inG(g.id),
+            ex = R.ex === g.id,
+            cnt = g.m.length + (j ? 1 : 0);
+          return `<div style="border:1px solid var(--line);border-radius:10px;padding:12px"><div class="row" style="margin-top:0"><b>${g.t}</b><span class="badge ${g.open ? "b1" : "b2"}">${g.open ? "open" : "closed"}</span></div><div class="m">Node: ${nd ? esc(nd.t) : g.node} · next ${g.when}</div><div style="margin:8px 12px 8px 0">${g.m.map((i) => av(PEERS[i].n, i)).join("")}${j ? av("You", 0) : ""} <span class="m" style="margin-left:12px">${cnt} members</span></div><div class="row"><button onclick="R.ex=${ex ? "null" : `'${g.id}'`};comm()">${ex ? "Hide" : "Details"}</button><span><button onclick="pingStuck('${g.id}')">I'm stuck</button> <button class="${j ? "" : "p"}" ${!g.open && !j ? "disabled" : ""} onclick="join('${g.id}')">${j ? "Leave" : "Join"}</button></span></div>${
+            ex
+              ? `<div class="m">MEMBERS</div>${g.m.map((i) => `<div>${PEERS[i].n}, ${PEERS[i].c} · ${PEERS[i].h} h/wk · ${PEERS[i].g}</div>`).join("")}<div class="m" style="margin-top:8px">SHARED CHECKLIST (node items)</div>${
+                  nd
+                    ? nd.items
+                        .slice(0, 4)
+                        .map((i) => ck(nd, i))
+                        .join("")
+                    : '<div class="m">Build a roadmap to see it.</div>'
+                }<div class="m" style="margin-top:8px">PINNED</div>${CRS.filter(
+                  (c) => nd && c.sk.some((s) => nd.sk.includes(s)),
+                )
+                  .slice(0, 2)
+                  .map(
+                    (c) =>
+                      `<div><a href="${c.u}" target="_blank" rel="noopener">${esc(c.t)}</a></div>`,
+                  )
+                  .join("")}`
+              : ""
+          }</div>`;
+        }).join("");
+      }
+      function join(id) {
+        S.joined = S.joined || [];
+        const g = GRP.find((x) => x.id === id),
+          i = S.joined.indexOf(id);
+        i < 0 ? S.joined.push(id) : S.joined.splice(i, 1);
+        S.act.push((i < 0 ? "Joined group " : "Left group ") + g.t);
+        render();
+      }
+      function pingStuck(id) {
+        S.act.push("Pinged " + GRP.find((g) => g.id === id).t + ": I'm stuck");
+        render();
+      }
+      const _r = render;
+      render = function () {
+        _r();
+        rsrc();
+        comm();
+        const j = (S.joined || [])
+          .map((id) => GRP.find((g) => g.id === id))
+          .filter(Boolean);
+        if (j.length)
+          $("ppl").innerHTML += j
+            .map(
+              (g) =>
+                `<div class="row"><span>Group: ${g.t}</span><span class="m">next ${g.when}</span></div>`,
+            )
+            .join("");
+      };
+      /* 3D HERO: skill towers (height = level, ghost = gap to target) inside a ring segmented by roadmap phase. Hidden on mobile or reduced motion; the skills list is the 2D fallback. */
+      let TH = null;
+      function initTH(cv) {
+        try {
+          const H = 420,
+            ren = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+          ren.setPixelRatio(Math.min(devicePixelRatio, 2));
+          ren.setSize(cv.clientWidth, H, false);
+          const sc = new THREE.Scene();
+          sc.background = new THREE.Color(0x232b14);
+          sc.fog = new THREE.Fog(0x232b14, 16, 34);
+          const cam = new THREE.PerspectiveCamera(
+            40,
+            cv.clientWidth / H,
+            0.1,
+            100,
+          );
+          sc.add(new THREE.AmbientLight(0xffffff, 0.85));
+          const pl = new THREE.PointLight(0xe6f0b8, 1.0, 40);
+          pl.position.set(-6, 6, -4);
+          sc.add(pl);
+          const dl = new THREE.DirectionalLight(0xffffff, 0.9);
+          dl.position.set(5, 10, 6);
+          sc.add(dl);
+          const grp = new THREE.Group(),
+            ring = new THREE.Group();
+          sc.add(grp);
+          grp.add(ring);
+          ring.rotation.x = -Math.PI / 2;
+          ring.position.y = 0.05;
+          const base = new THREE.Mesh(
+            new THREE.CylinderGeometry(6.6, 6.6, 0.3, 56),
+            new THREE.MeshStandardMaterial({ color: 0x2f3a1e }),
+          );
+          base.position.y = -0.15;
+          grp.add(base);
+          const ray = new THREE.Raycaster(),
+            mv = new THREE.Vector2(9, 9),
+            tip = $("tip");
+          let rx = 0.62,
+            ry = 0,
+            dr = 0,
+            lx = 0,
+            ly = 0,
+            mvd = 0,
+            hov = null;
+          TH = { o: {}, grp, ring };
+          cv.addEventListener("pointerdown", (e) => {
+            dr = 1;
+            mvd = 0;
+            lx = e.clientX;
+            ly = e.clientY;
+            cv.style.cursor = "grabbing";
+          });
+          addEventListener("pointerup", () => {
+            if (dr && mvd < 5 && hov) skillPanel(hov);
+            dr = 0;
+            cv.style.cursor = "grab";
+          });
+          cv.addEventListener("pointermove", (e) => {
+            const r = cv.getBoundingClientRect();
+            mv.set(
+              ((e.clientX - r.left) / r.width) * 2 - 1,
+              -((e.clientY - r.top) / r.height) * 2 + 1,
+            );
+            tip.style.left =
+              Math.min(e.clientX - r.left + 14, r.width - 240) + "px";
+            tip.style.top = e.clientY - r.top + 14 + "px";
+            if (dr) {
+              const dx = e.clientX - lx,
+                dy = e.clientY - ly;
+              mvd += Math.abs(dx) + Math.abs(dy);
+              ry = Math.max(-1, Math.min(1, ry + dx * 0.005));
+              rx = Math.max(0.35, Math.min(1, rx + dy * 0.004));
+              lx = e.clientX;
+              ly = e.clientY;
+            }
+          });
+          cv.addEventListener("pointerleave", () => {
+            mv.set(9, 9);
+          });
+          addEventListener("resize", () => {
+            if (cv.clientWidth) {
+              ren.setSize(cv.clientWidth, H, false);
+              cam.aspect = cv.clientWidth / H;
+              cam.updateProjectionMatrix();
+            }
+          });
+          const loop = (t) => {
+            requestAnimationFrame(loop);
+            if (!cv.clientWidth) return;
+            const a = ry + Math.sin(t / 4000) * 0.12;
+            cam.position.set(
+              Math.sin(a) * 17 * Math.cos(rx),
+              Math.sin(rx) * 17,
+              Math.cos(a) * 17 * Math.cos(rx),
+            );
+            cam.lookAt(0, 1.3, 0);
+            Object.values(TH.o).forEach((o) => {
+              o.cur += (o.t - o.cur) * 0.08;
+              o.gh += (o.tg - o.gh) * 0.08;
+              o.m.scale.set(1.3, o.cur, 1.3);
+              o.m.position.y = o.cur / 2;
+              o.g.visible = o.gh > 0.03;
+              o.g.scale.set(1.3, Math.max(0.001, o.gh), 1.3);
+              o.g.position.y = o.cur + o.gh / 2;
+            });
+            ray.setFromCamera(mv, cam);
+            const hit = ray.intersectObjects(
+              Object.values(TH.o).map((o) => o.m),
+            )[0];
+            hov = hit ? hit.object.userData.id : null;
+            const s = S.skills.find((x) => x.id === hov);
+            if (s) {
+              tip.style.display = "block";
+              tip.innerHTML =
+                "<b>" +
+                esc(s.name) +
+                "</b> knows " +
+                know(s) +
+                " of " +
+                total(s) +
+                " elements<br>" +
+                Object.keys(S.known[s.name] || {})
+                  .slice(0, 4)
+                  .map(esc)
+                  .join("<br>");
+            } else tip.style.display = "none";
+            ren.render(sc, cam);
+          };
+          requestAnimationFrame(loop);
+        } catch (e) {
+          TH = null;
+          $("hero").style.display = "none";
+        }
+      }
+      function scene() {
+        const hero = $("hero");
+        if (!hero || !window.THREE) return;
+        if (
+          innerWidth < 768 ||
+          matchMedia("(prefers-reduced-motion:reduce)").matches
+        ) {
+          hero.style.display = "none";
+          return;
+        }
+        hero.style.display = "block";
+        if (!TH) {
+          initTH($("cv"));
+          if (!TH) return;
+        }
+        const ids = new Set(S.skills.map((s) => s.id));
+        Object.keys(TH.o).forEach((k) => {
+          if (!ids.has(k)) {
+            TH.grp.remove(TH.o[k].m, TH.o[k].g);
+            delete TH.o[k];
+          }
+        });
+        S.skills.forEach((s, i) => {
+          let o = TH.o[s.id];
+          if (!o) {
+            const m = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshStandardMaterial({
+                  color: s.cat === "ML" ? 0xdce6c4 : 0x8a9e52,
+                  metalness: 0.45,
+                  roughness: 0.32,
+                }),
+              ),
+              g = new THREE.Mesh(
+                new THREE.BoxGeometry(1, 1, 1),
+                new THREE.MeshStandardMaterial({
+                  color: 0xffffff,
+                  transparent: true,
+                  opacity: 0.14,
+                }),
+              );
+            m.userData.id = s.id;
+            TH.grp.add(m, g);
+            o = TH.o[s.id] = { m, g, cur: 0.05, gh: 0 };
+          }
+          o.m.position.x = o.g.position.x = ((i % 3) - 1) * 2.6;
+          o.m.position.z = o.g.position.z = (Math.floor(i / 3) - 0.5) * 2.6;
+          o.t = Math.max(0.1, lvl(s) * 0.8);
+          o.tg = Math.max(0, (s.tgt - lvl(s)) * 0.8);
+        });
+        while (TH.ring.children.length) TH.ring.remove(TH.ring.children[0]);
+        const ph = {};
+        S.nodes.forEach((n) => (ph[n.ph] = ph[n.ph] || []).push(n));
+        const ks = Object.keys(ph),
+          seg = (Math.PI * 2) / Math.max(1, ks.length),
+          arc = seg * 0.86;
+        ks.forEach((k, i) => {
+          const d = ph[k].reduce((a, n) => a + dn(n), 0),
+            t = ph[k].reduce((a, n) => a + tot(n), 0),
+            f = t ? d / t : 0,
+            tr = new THREE.Mesh(
+              new THREE.TorusGeometry(5.5, 0.1, 10, 40, arc),
+              new THREE.MeshStandardMaterial({ color: 0x3c4724 }),
+            );
+          tr.rotation.z = i * seg;
+          TH.ring.add(tr);
+          if (f > 0) {
+            const fl = new THREE.Mesh(
+              new THREE.TorusGeometry(5.5, 0.17, 12, 40, arc * f),
+              new THREE.MeshStandardMaterial({ color: 0xb7cc8a }),
+            );
+            fl.rotation.z = i * seg;
+            TH.ring.add(fl);
+          }
+        });
+        $("hp").innerHTML =
+          '<div style="font:12px Geist Mono,monospace;color:#8A93A6">PROGRESS</div><div style="font-size:72px;font-weight:700;letter-spacing:-.04em;line-height:1">' +
+          overall() +
+          '%</div><div style="color:#C5CBD8">' +
+          left() +
+          " items left, " +
+          (S.nodes.length && P ? P.weeks : 0) +
+          " weeks needed</div>";
+      }
+      function stat(id, k) {
+        const n = N(id);
+        if (k === "learn") n.learn = !n.learn;
+        else if (k === "done") {
+          n.items.forEach((i) => {
+            if (!i.skip) i.done = 1;
+          });
+          n.learn = false;
+          S.act.push("Finished " + n.t + " (unverified)");
+        } else {
+          const all = n.items.every((i) => i.skip);
+          n.items.forEach((i) => {
+            i.skip = all ? 0 : 1;
+            if (!all) i.done = 0;
+          });
+          S.act.push((all ? "Restored " : "Skipped ") + n.t);
+        }
+        render();
+      }
+      function strip() {
+        const ns = S.nodes,
+          d = ns.filter((n) => tot(n) && nPct(n) >= 1).length,
+          l = ns.filter((n) => n.learn && nPct(n) < 1).length,
+          k = ns.filter((n) => tot(n) === 0).length;
+        $("strip").innerHTML =
+          "<b>" +
+          esc(S.p.role || "No target role") +
+          "</b><span>" +
+          d +
+          " done</span><span>" +
+          l +
+          " learning</span><span>" +
+          k +
+          " skipped</span><span>" +
+          left() +
+          ' items left</span><span style="flex:1;min-width:120px;height:10px;border:2px solid #0B0C0F;border-radius:6px;background:#fff;overflow:hidden"><i style="display:block;height:100%;width:' +
+          overall() +
+          '%;background:#0B0C0F;transition:width .6s"></i></span><b>' +
+          overall() +
+          "%</b>";
+      }
+      const _r2 = render;
+      render = function () {
+        _r2();
+        scene();
+        strip();
+      };
+      /* LEVELS, PROOF, REPO ANALYSIS, DETAILED PANELS */
+      const LV = ["None", "Beginner", "Basic", "Working", "Advanced", "Expert"],
+        LD = [
+          "No exposure yet",
+          "Knows the concepts",
+          "Can build small things with docs open",
+          "Ships working projects on their own",
+          "Designs, tests and explains larger systems",
+          "Leads others; verified by a mentor",
+        ];
+      function proof(s) {
+        const ns = S.nodes.filter((n) => n.sk.includes(s.name)),
+          t = ns.reduce((a, n) => a + tot(n), 0),
+          d = ns.reduce((a, n) => a + dn(n), 0),
+          vp = S.projects.filter((p) => p.ver && p.sk.includes(s.name)),
+          L = [];
+        if (s.lvl)
+          L.push({ k: "Self-declared", x: "Level " + s.lvl, w: "low" });
+        (s.rep || []).forEach((r) =>
+          L.push({
+            k: "Repo analysis",
+            x: r.repo + ": " + r.notes + " (level " + r.lvl + ")",
+            w: "medium",
+          }),
+        );
+        if (t)
+          L.push({
+            k: "Roadmap work",
+            x: d + " of " + t + " linked items done",
+            w: "low",
+          });
+        vp.forEach((p) =>
+          L.push({
+            k: "Mentor-verified",
+            x: p.t + ", by " + p.ver.by,
+            w: "high",
+          }),
+        );
+        s.ev
+          .filter((e) => !/^repo analysis/.test(e))
+          .forEach((e) =>
+            L.push({
+              k: "Evidence",
+              x: e,
+              w: /cert/.test(e) ? "medium" : "low",
+            }),
+          );
+        return {
+          L,
+          conf: vp.length ? "high" : (s.rep || []).length ? "medium" : "low",
+        };
+      }
+      const pips = (v, t) =>
+        '<div class="pips">' +
+        [1, 2, 3, 4, 5]
+          .map(
+            (i) => '<i class="' + (i <= v ? "f" : i <= t ? "t" : "") + '"></i>',
+          )
+          .join("") +
+        "</div>";
+      function skillsUI() {
+        $("sk").innerHTML = S.skills.length
+          ? S.skills
+              .map((s) => {
+                const v = lvl(s),
+                  p = proof(s);
+                return `<div style="margin-bottom:14px"><div class="row" style="margin-bottom:3px"><a href="#" onclick="skillPanel('${s.id}');return false"><b>${esc(s.name)}</b></a><span class="m">LEVEL ${v}: ${LV[v].toUpperCase()}</span></div>${pips(v, s.tgt)}<div class="m" style="margin-top:3px">Target ${s.tgt} (${LV[s.tgt]}). ${p.L.length} proof items. Confidence: ${p.conf}.</div></div>`;
+              })
+              .join("")
+          : '<div class="m">No skills yet. Upload a repo in Projects, or add a skill.</div>';
+      }
+      function skillPanel(id) {
+        const s = S.skills.find((x) => x.id === id),
+          v = lvl(s),
+          p = proof(s);
+        sel = null;
+        $("panel").classList.add("open");
+        $("panel").innerHTML =
+          `<div class="row"><h2>${esc(s.name)}</h2><button onclick="$('panel').classList.remove('open')">Close</button></div><div class="m">LEVEL ${v}: ${LV[v].toUpperCase()}. ${LD[v]}.</div><div style="margin:8px 0">${pips(v, s.tgt)}</div><p class="m">${nextHint(s) || (v >= s.tgt ? "At target." : "Complete linked items or upload a repo that uses this skill.")}</p><div class="m">PROOF (${p.conf} confidence)</div>${p.L.map((x) => `<div class="card"><b>${x.k}</b> <span class="badge ${x.w === "high" ? "b1" : ""}">${x.w}</span><br><span class="m">${esc(x.x)}</span></div>`).join("") || '<div class="m">No proof yet.</div>'}<div class="m">LINKED NODES</div>${
+            S.nodes
+              .filter((n) => n.sk.includes(s.name))
+              .map(
+                (n) =>
+                  `<div><a href="#" onclick="openNode('${n.id}');return false">${esc(n.t)}</a></div>`,
+              )
+              .join("") || '<div class="m">none</div>'
+          }<button style="margin-top:12px" onclick="S.skills=S.skills.filter(x=>x.id!=='${id}');$('panel').classList.remove('open');render()">Delete skill</button>`;
+      }
+      function nextUI() {
+        const nx = [];
+        S.nodes
+          .filter((n) => !locked(n))
+          .forEach((n) =>
+            n.items
+              .filter((i) => !i.done && !i.skip)
+              .forEach((i) => nx.push([n, i])),
+          );
+        const cap = S.p.hours || 0;
+        let used = 0;
+        const pk = [];
+        for (const [n, i] of nx) {
+          const h = Math.max(
+            0.5,
+            Math.round(
+              ((P && P.eff[n.id] === "free" && n.freeH ? n.freeH : n.h) /
+                Math.max(1, tot(n))) *
+                2,
+            ) / 2,
+          );
+          if (cap && used + h > cap && pk.length) break;
+          used += h;
+          pk.push([n, i, h]);
+          if (pk.length >= 5) break;
+        }
+        $("next").innerHTML = pk.length
+          ? `<div class="m">PLANNED ${used}h OF ${cap}h THIS WEEK</div><div class="bar" style="margin:4px 0 10px"><i style="width:${cap ? Math.min(100, (used / cap) * 100) : 0}%"></i></div>` +
+            pk
+              .map(([n, i, h]) => {
+                const sk = S.skills.find((s) => n.sk.includes(s.name)),
+                  c = i.cid
+                    ? CRS.find((x) => x.id === i.cid)
+                    : CRS.find(
+                        (x) =>
+                          x.tier === "free" &&
+                          x.sk.some((z) => n.sk.includes(z)),
+                      );
+                return `<div class="card">${ck(n, i)}<div class="m">${esc(n.t)}, about ${h}h</div>${sk ? `<div class="m">Why: adds "${esc(i.el || i.text)}" to what you know in ${esc(sk.name)} (${know(sk)} of ${total(sk)} known)</div>` : ""}${c ? `<div class="m">Use: <a href="${c.u}" target="_blank" rel="noopener">${esc(c.t)}</a> (${c.tier}, ${c.h}h)</div>` : ""}<div class="m">Proof: commit your work to a repo, then upload it in Projects to update your level.</div></div>`;
+              })
+              .join("")
+          : '<div class="m">Approve a plan to get weekly actions.</div>';
+      }
+      let LASTREP = null;
+      async function analyze(files) {
+        const all = [...files].filter(
+          (f) =>
+            !/(^|\/)(node_modules|\.git|venv|\.venv|dist|build|__pycache__|\.next)\//.test(
+              f.webkitRelativePath || "",
+            ),
+        );
+        if (!all.length) return;
+        const root =
+            (all[0].webkitRelativePath || "repo").split("/")[0] || "repo",
+          c = {
+            py: 0,
+            pyf: 0,
+            sql: 0,
+            sqlf: 0,
+            js: 0,
+            jsf: 0,
+            tests: 0,
+            readme: 0,
+            ci: 0,
+            cls: 0,
+            typ: 0,
+            emb: 0,
+            st: 0,
+            ml: 0,
+            dl: 0,
+            met: 0,
+          };
+        let bud = 4e6,
+          n = 0;
+        for (const f of all) {
+          const p = f.webkitRelativePath || f.name,
+            m = p.match(/\.([A-Za-z0-9]+)$/),
+            e = m ? m[1].toLowerCase() : "";
+          if (
+            /(^|\/)(tests?|__tests__)\//i.test(p) ||
+            /(^|\/)test_[^/]*\.py$|\.test\.[jt]sx?$/i.test(p)
+          )
+            c.tests++;
+          if (/readme/i.test(p)) c.readme = 1;
+          if (/\.github\/workflows\//.test(p)) c.ci = 1;
+          if (
+            !["py", "ipynb", "sql", "js", "jsx", "ts", "tsx"].includes(e) ||
+            f.size > 3e5 ||
+            bud <= 0
+          )
+            continue;
+          bud -= f.size;
+          n++;
+          let t = "";
+          try {
+            t = await f.text();
+          } catch (x) {
+            continue;
+          }
+          if (e === "ipynb") {
+            try {
+              t = JSON.parse(t)
+                .cells.filter((k) => k.cell_type === "code")
+                .map((k) => [].concat(k.source).join(""))
+                .join("\n");
+            } catch (x) {}
+          }
+          const loc = t
+              .split("\n")
+              .filter((l) => l.trim() && !/^\s*(#|\/\/|--)/.test(l)).length,
+            cnt = (r) => (t.match(r) || []).length;
+          if (e === "py" || e === "ipynb") {
+            c.py += loc;
+            c.pyf++;
+            c.cls += cnt(/^\s*class\s/gm);
+            c.typ += cnt(/def .*->|:\s*(int|str|float|bool|list|dict)\b/g);
+            c.emb += cnt(
+              /\b(select\s[\s\S]{1,200}?\sfrom|join\s+\w+\s+on|group by|over\s*\()/gi,
+            );
+            c.st += cnt(
+              /scipy|statsmodels|ttest|p_value|confidence interval|chi2|anova|bootstrap/gi,
+            );
+            c.ml += cnt(
+              /sklearn|xgboost|lightgbm|train_test_split|cross_val|GridSearch|\.fit\(|\.predict\(/g,
+            );
+            c.met += cnt(
+              /accuracy_score|f1_score|roc_auc|rmse|mean_squared_error|cross_val/gi,
+            );
+            c.dl += cnt(
+              /import torch|tensorflow|keras|nn\.Module|optimizer\.step|model\.fit/g,
+            );
+          } else if (e === "sql") {
+            c.sql += loc;
+            c.sqlf++;
+          } else {
+            c.js += loc;
+            c.jsf++;
+          }
+        }
+        const lv = (l, a = 100, b = 500) => (l < a ? 1 : l < b ? 2 : 3),
+          R = [],
+          sq = c.sql + c.emb * 15;
+        if (c.py)
+          R.push([
+            "Python",
+            Math.min(
+              4,
+              lv(c.py) +
+                (c.tests && c.py >= 100 ? 1 : 0) +
+                (c.cls > 5 || c.typ > 10 ? 1 : 0),
+            ),
+            c.pyf +
+              " files, " +
+              c.py +
+              " lines" +
+              (c.cls ? ", " + c.cls + " classes" : "") +
+              (c.tests ? ", tests found" : ""),
+          ]);
+        if (sq >= 10)
+          R.push([
+            "SQL",
+            lv(sq, 40, 200),
+            c.sqlf + " .sql files, " + c.emb + " embedded queries",
+          ]);
+        if (c.st > 0)
+          R.push([
+            "Stats",
+            c.st < 3 ? 1 : c.st < 8 ? 2 : 3,
+            c.st + " statistical-test references",
+          ]);
+        if (c.ml > 1)
+          R.push([
+            "ML",
+            Math.min(
+              4,
+              (c.ml < 6 ? 1 : c.ml < 20 ? 2 : 3) + (c.met > 2 ? 1 : 0),
+            ),
+            c.ml + " modelling calls, " + c.met + " evaluation references",
+          ]);
+        if (c.dl > 0)
+          R.push([
+            "DL",
+            c.dl < 4 ? 1 : c.dl < 12 ? 2 : 3,
+            c.dl + " deep-learning references",
+          ]);
+        if (c.js >= 50)
+          R.push([
+            "JavaScript",
+            lv(c.js),
+            c.jsf + " files, " + c.js + " lines",
+          ]);
+        R.push([
+          "Projects",
+          Math.min(4, 1 + c.readme + (c.tests ? 1 : 0) + c.ci),
+          "README " +
+            (c.readme ? "yes" : "no") +
+            ", tests " +
+            (c.tests ? "yes" : "no") +
+            ", CI " +
+            (c.ci ? "yes" : "no"),
+        ]);
+        R.forEach(([name, l, notes]) => {
+          let s = S.skills.find(
+            (x) => x.name.toLowerCase() === name.toLowerCase(),
+          );
+          if (!s) {
+            s = {
+              id: uid(),
+              name,
+              cat: "Detected",
+              lvl: 0,
+              tgt: 4,
+              ev: [],
+              rep: [],
+            };
+            S.skills.push(s);
+          }
+          s.rep = (s.rep || []).filter((r) => r.repo !== root);
+          s.rep.push({ repo: root, lvl: l, notes });
+          s.rl = Math.max(...s.rep.map((r) => r.lvl));
+          s.ev = s.ev.filter((e) => e.indexOf("repo analysis: " + root) !== 0);
+          s.ev.push("repo analysis: " + root + " (" + notes + ")");
+        });
+        if (!S.projects.some((p) => p.t === root))
+          S.projects.push({
+            id: uid(),
+            t: root,
+            tags: R.map((r) => r[0]).filter((x) => x !== "Projects"),
+            st: "Building",
+            rub: [
+              { c: "README present", p: c.readme },
+              { c: "Tests present", p: c.tests ? 1 : 0 },
+              { c: "CI configured", p: c.ci },
+              { c: "At least 5 source files", p: n >= 5 ? 1 : 0 },
+            ],
+            sk: R.map((r) => r[0]),
+            node: null,
+            ver: null,
+            req: false,
+          });
+        LASTREP = { root, n, R };
+        S.act.push(
+          "Analyzed repo " +
+            root +
+            ": " +
+            R.map((r) => r[0] + " L" + r[1]).join(", "),
+        );
+        render();
+      }
+      function projUI() {
+        const rep = LASTREP
+          ? `<div class="card" style="border-color:var(--red)"><b>Repo analysis: ${esc(LASTREP.root)}</b><div class="m">${LASTREP.n} source files read in your browser. Nothing is uploaded anywhere.</div>${LASTREP.R.map((r) => `<div class="row"><span>${esc(r[0])}: <b>Level ${r[1]}, ${LV[r[1]]}</b></span><span class="m">${esc(r[2])}</span></div>`).join("")}<div class="m">Heuristic from code size, libraries, tests and structure. Capped at level 4 until a mentor verifies.</div></div>`
+          : "";
+        $("proj").insertAdjacentHTML(
+          "afterbegin",
+          `<div class="card"><b>Upload a repo folder</b><div class="m">Pick the project folder. Guide reads the code to work out which skills you use and at what level, then updates your skills.</div><input type="file" webkitdirectory multiple onchange="analyze(this.files)" style="margin-top:8px"></div>${rep}`,
+        );
+      }
+      const MENT = [
+        {
+          n: "Ria K.",
+          r: "Data Scientist, Swiggy",
+          t: "Alumna",
+          c: "DTU 2021",
+          s: ["ML", "SQL"],
+          a: "Saturday mornings",
+        },
+        {
+          n: "Neha B.",
+          r: "Analytics Manager, Flipkart",
+          t: "Alumna",
+          c: "NSUT 2018",
+          s: ["SQL", "Stats"],
+          a: "By request",
+        },
+        {
+          n: "Arjun N.",
+          r: "Final year, ML intern at Razorpay",
+          t: "Senior",
+          c: "DTU",
+          s: ["Python", "Stats"],
+          a: "Weeknights",
+        },
+        {
+          n: "Dr. S. Mehra",
+          r: "Assistant Professor, CSE",
+          t: "Faculty",
+          c: "DTU",
+          s: ["ML", "DL"],
+          a: "Friday 3 to 5 pm",
+        },
+      ];
+      function pplUI() {
+        const gap = S.skills
+            .filter((s) => know(s) < total(s))
+            .map((s) => s.name),
+          link = (m) =>
+            "mailto:?subject=" +
+            encodeURIComponent("Mentoring request from " + S.p.name) +
+            "&body=" +
+            encodeURIComponent(
+              "Hi " +
+                m.n +
+                ", I am working toward " +
+                (S.p.role || "a new role") +
+                " and would value 15 minutes of your advice.",
+            ),
+          row = (m) =>
+            `<div class="row"><span><b>${esc(m.n)}</b> <span class="m">${m.t}, ${esc(m.c)}</span><br><span class="m">${esc(m.r)}. ${m.s.length ? "Skills: " + m.s.join(", ") + ". " : ""}${m.a}</span>${m.s.some((x) => gap.includes(x)) ? '<br><span class="badge b1">covers one of your gaps</span>' : ""}</span><span><button class="x2" onclick="outreach('${q(m.n)}')">Draft note</button> <a href="${link(m)}">Message</a></span></div>`,
+          g = (t, a) =>
+            `<div class="m" style="margin-top:10px">${t}</div>` +
+            a.map(row).join(""),
+          pe = PEERS.slice(0, 4).map((p) => ({
+            n: p.n,
+            t: "Peer",
+            c: p.c,
+            r: p.g,
+            s: [],
+            a: p.h + " h/wk",
+          })),
+          j = (S.joined || [])
+            .map((id) => GRP.find((x) => x.id === id))
+            .filter(Boolean);
+        $("ppl").innerHTML =
+          (S.rev
+            ? `<div class="row"><span>Review from ${esc(S.rev.who)}: ${esc(S.rev.text)}</span><span class="badge ${S.rev.st === "accepted" ? "b1" : "b2"}">${S.rev.st}</span></div>`
+            : "") +
+          g(
+            "MENTORS",
+            MENT.filter((m) => m.t !== "Alumna"),
+          ) +
+          g(
+            "ALUMNI",
+            MENT.filter((m) => m.t === "Alumna"),
+          ) +
+          g("PEERS (demo)", pe) +
+          (j.length
+            ? '<div class="m" style="margin-top:10px">MY GROUPS</div>' +
+              j
+                .map(
+                  (x) =>
+                    `<div class="row"><span>${x.t}</span><span class="m">next ${x.when}</span></div>`,
+                )
+                .join("")
+            : "");
+      }
+      const _r3 = render;
+      render = function () {
+        _r3();
+        skillsUI();
+        nextUI();
+        projUI();
+        pplUI();
+      };
+
+      /* ELEMENTS: skills are lists of things you know (with proof), not levels. S.known[skill][element] = proof source. */
+      const ELEM = {
+        Python: [
+          "variables, loops, conditionals",
+          "functions & modules",
+          "list/dict comprehensions",
+          "file & CSV I/O",
+          "classes & OOP",
+          "virtual environments & pip",
+          "pandas DataFrames",
+          "groupby & merge",
+          "matplotlib/seaborn plots",
+          "pytest testing",
+        ],
+        SQL: [
+          "SELECT, WHERE, ORDER BY",
+          "JOINs",
+          "GROUP BY & aggregates",
+          "subqueries & CTEs",
+          "window functions",
+          "indexes & query plans",
+        ],
+        Stats: [
+          "descriptive statistics",
+          "probability distributions",
+          "sampling & CLT",
+          "hypothesis tests",
+          "confidence intervals",
+          "A/B test design",
+        ],
+        ML: [
+          "train/test split",
+          "linear & logistic regression",
+          "decision trees & ensembles",
+          "cross-validation",
+          "feature engineering",
+          "evaluation metrics",
+          "error analysis",
+        ],
+        DL: [
+          "neural net from scratch",
+          "PyTorch tensors & autograd",
+          "CNN basics",
+          "training loops",
+          "fine-tuning a pretrained model",
+        ],
+        Projects: [
+          "README with setup steps",
+          "tests",
+          "CI workflow",
+          "benchmark or metric",
+          "demo or write-up",
+        ],
+        Viz: [
+          "chart choice",
+          "dashboard tool",
+          "data storytelling",
+          "stakeholder summary",
+        ],
+        Ops: [
+          "git & branching",
+          "Docker",
+          "model serving API",
+          "experiment tracking",
+          "monitoring & drift",
+        ],
+      };
+      const CATX = {
+        viz: {
+          id: "viz",
+          t: "Dashboards & storytelling",
+          ph: "SteppingStone",
+          h: 25,
+          paid: 0,
+          req: ["sql"],
+          sk: ["Viz"],
+          pr: 3,
+        },
+        ops: {
+          id: "ops",
+          t: "MLOps basics",
+          ph: "Specialization",
+          h: 30,
+          paid: 0,
+          req: ["ml"],
+          sk: ["Ops"],
+          pr: 2,
+        },
+      };
+      const ROLE = {
+        "Data Scientist": ["py", "sql", "st", "ml", "dl", "cap"],
+        "Data Analyst": ["py", "sql", "st", "viz", "cap"],
+        "ML Engineer": ["py", "st", "ml", "dl", "ops", "cap"],
+      };
+      const def = (id) => CAT.find((c) => c.id === id) || CATX[id],
+        roleKey = (r) =>
+          /analy/i.test(r || "")
+            ? "Data Analyst"
+            : /ml eng|machine learning eng|mlops/i.test(r || "")
+              ? "ML Engineer"
+              : "Data Scientist";
+      const elems = (sk) =>
+          (ELEM[sk] || []).concat((S.extra && S.extra[sk]) || []),
+        isK = (sk, e) => !!(S.known && S.known[sk] && S.known[sk][e]);
+      const know = (s) => elems(s.name).filter((e) => isK(s.name, e)).length,
+        total = (s) => elems(s.name).length,
+        q = (s) => esc(s).replace(/'/g, "&#39;");
+      function setK(sk, e, src) {
+        S.known = S.known || {};
+        (S.known[sk] = S.known[sk] || {})[e] = src;
+      }
+      function unK(sk, e) {
+        if (S.known && S.known[sk]) delete S.known[sk][e];
+      }
+      function lvl(s) {
+        const t = total(s);
+        return t ? (know(s) / t) * 5 : 0;
+      }
+      function mk(c) {
+        const sk = c.sk[0];
+        return {
+          ...c,
+          notes: "",
+          items: elems(sk).map((e) => ({
+            id: uid(),
+            text: e,
+            el: e,
+            done: isK(sk, e) ? 1 : 0,
+            skip: 0,
+          })),
+        };
+      }
+      const mkSk = (n) => ({
+        id: uid(),
+        name: n,
+        cat: "Core",
+        lvl: 0,
+        tgt: 5,
+        ev: [],
+        rep: [],
+      });
+      function seed() {
+        S = {
+          p: {
+            name: "Aarav Mehta",
+            college: "DTU, Year 3",
+            role: "Data Scientist",
+            hours: 8,
+            budget: 5000,
+            weeks: 20,
+            github: "aarav-m",
+          },
+          skills: ["Python", "SQL", "Stats", "ML", "DL", "Projects"].map(mkSk),
+          projects: [
+            {
+              id: "p1",
+              t: "Price-anomaly detector",
+              tags: ["Python", "scraping"],
+              st: "Building",
+              rub: [
+                { c: "Runs end to end", p: 1 },
+                { c: "Tests added", p: 1 },
+                { c: "Benchmarked", p: 0 },
+                { c: "README written", p: 0 },
+              ],
+              sk: ["Projects", "ML"],
+              node: "cap",
+              ver: null,
+              req: false,
+            },
+          ],
+          nodes: [],
+          act: ["Joined group SQL Sprint"],
+          route: {},
+          rev: null,
+          known: {},
+          extra: {},
+        };
+        const K = (sk, a, src) => a.forEach((e) => setK(sk, e, src));
+        K(
+          "Python",
+          [
+            "variables, loops, conditionals",
+            "functions & modules",
+            "file & CSV I/O",
+            "pandas DataFrames",
+            "list/dict comprehensions",
+          ],
+          "repo: stock-scraper/scraper.py",
+        );
+        K("Python", ["classes & OOP"], "self-declared");
+        K("SQL", ["SELECT, WHERE, ORDER BY", "JOINs"], "self-declared");
+        K(
+          "Stats",
+          [
+            "descriptive statistics",
+            "probability distributions",
+            "sampling & CLT",
+          ],
+          "cert: NPTEL Stats",
+        );
+        K("ML", ["train/test split"], "self-declared");
+        K(
+          "Projects",
+          ["README with setup steps"],
+          "repo: stock-scraper/README.md",
+        );
+        adapt(true);
+      }
+      function blank() {
+        S = {
+          p: {
+            name: "You",
+            college: "",
+            role: "",
+            hours: 0,
+            budget: 0,
+            weeks: 0,
+            github: "",
+          },
+          skills: [],
+          projects: [],
+          nodes: [],
+          act: [],
+          route: {},
+          rev: null,
+          known: {},
+          extra: {},
+        };
+      }
+      /* DYNAMIC ROADMAP: the node set follows the role, each node's items are the elements you do not know yet. Changing role or knowledge adds/removes nodes and items; progress, notes and routes of nodes that stay are kept. */
+      const snap = () =>
+        Object.fromEntries(S.nodes.map((n) => [n.id, [n.t, tot(n) - dn(n)]]));
+      function diff(a, b) {
+        const o = [];
+        Object.keys(b).forEach((k) => {
+          if (!a[k]) o.push("added " + b[k][0]);
+          else if (a[k][1] !== b[k][1])
+            o.push(b[k][0] + ": " + a[k][1] + " to " + b[k][1] + " items left");
+        });
+        Object.keys(a).forEach((k) => {
+          if (!b[k]) o.push("removed " + a[k][0]);
+        });
+        return o.join("; ");
+      }
+      function syncItems() {
+        if (!S.known) return;
+        S.extra = S.extra || {};
+        S.skills.forEach((s) => (s.tgt = 5));
+        S.nodes.forEach((n) => {
+          const sk = n.sk[0],
+            es = elems(sk);
+          es.forEach((e) => {
+            if (!n.items.some((i) => i.el === e))
+              n.items.push({ id: uid(), text: e, el: e, done: 0, skip: 0 });
+          });
+          n.items = n.items.filter((i) => !i.el || es.includes(i.el));
+          n.items.forEach((i) => {
+            if (i.el) i.done = isK(sk, i.el) ? 1 : 0;
+          });
+        });
+      }
+      function fixReq() {
+        const ids = S.nodes.map((n) => n.id);
+        S.nodes.forEach((n) => {
+          if (n.custom) {
+            n.req = (n.req || []).filter((r) => ids.includes(r));
+            return;
+          }
+          let r = (def(n.id).req || []).filter((x) => ids.includes(x));
+          if (n.id === "cap") {
+            const f = ["ml", "viz", "st"].find((x) => ids.includes(x));
+            r = f ? [f] : [];
+          }
+          n.req = r;
+        });
+      }
+      function relayout() {
+        const ids = S.nodes.map((n) => n.id),
+          d = {},
+          dep = (n) =>
+            d[n.id] !== undefined
+              ? d[n.id]
+              : (d[n.id] =
+                  1 +
+                  Math.max(
+                    -1,
+                    ...n.req
+                      .filter((r) => ids.includes(r))
+                      .map((r) => dep(S.nodes.find((x) => x.id === r))),
+                  ));
+        S.nodes.forEach(dep);
+        const cols = {};
+        S.nodes.forEach((n) => {
+          (cols[d[n.id]] = cols[d[n.id]] || []).push(n);
+        });
+        Object.keys(cols).forEach((k) =>
+          cols[k].forEach((n, i) => {
+            POS[n.id] = [
+              10 + k * 200,
+              cols[k].length === 1 ? 90 : 20 + i * 140,
+            ];
+          }),
+        );
+      }
+      function adapt(quiet) {
+        const ids = ROLE[roleKey(S.p.role)],
+          before = snap(),
+          keep = S.nodes.filter((n) => ids.includes(n.id) || n.custom),
+          have = new Set(keep.map((n) => n.id));
+        ids.forEach((id) => {
+          if (!have.has(id)) keep.push(mk(def(id)));
+        });
+        S.nodes = ids
+          .map((i) => keep.find((n) => n.id === i))
+          .filter(Boolean)
+          .concat(keep.filter((n) => n.custom));
+        S.nodes.forEach((n) =>
+          n.sk.forEach((k) => {
+            if (!S.skills.some((s) => s.name === k)) S.skills.push(mkSk(k));
+          }),
+        );
+        fixReq();
+        relayout();
+        syncItems();
+        replan();
+        const d = diff(before, snap());
+        if (!quiet && d) S.act.push("Roadmap adapted: " + d);
+        return d;
+      }
+      function reveal() {
+        say("Approved. Building your roadmap.");
+        S.act.push("Approved roadmap");
+        const ids = ROLE[roleKey(S.p.role)];
+        ids.forEach((i) => {
+          const k = def(i).sk[0];
+          if (!S.skills.some((s) => s.name === k)) S.skills.push(mkSk(k));
+        });
+        S.nodes = [];
+        let i = 0;
+        location.hash = "roadmap";
+        const t = setInterval(() => {
+          S.nodes.push(mk(def(ids[i])));
+          fixReq();
+          relayout();
+          i++;
+          render();
+          if (i >= ids.length) {
+            clearInterval(t);
+            say(
+              "Done. Tell me what you already know, for example “I know pandas groupby”, or change your role. The roadmap adapts without starting over.",
+            );
+          }
+        }, 450);
+      }
+      function tog(nid, iid) {
+        const n = N(nid),
+          i = n.items.find((x) => x.id === iid);
+        if (i.el) {
+          isK(n.sk[0], i.el)
+            ? unK(n.sk[0], i.el)
+            : setK(n.sk[0], i.el, "ticked in roadmap");
+        } else i.done = i.done ? 0 : 1;
+        S.act.push("Toggled: " + i.text);
+        render();
+      }
+      function stat(id, k) {
+        const n = N(id);
+        if (k === "learn") n.learn = !n.learn;
+        else if (k === "done") {
+          n.items.forEach((i) => {
+            if (i.el && !i.skip) setK(n.sk[0], i.el, "marked node done");
+            else i.done = 1;
+          });
+          n.learn = false;
+          S.act.push("Marked " + n.t + " as known (unverified)");
+        } else {
+          const all = n.items.every((i) => i.skip);
+          n.items.forEach((i) => (i.skip = all ? 0 : 1));
+          S.act.push((all ? "Restored " : "Skipped ") + n.t);
+        }
+        render();
+      }
+      function flip(sk, e) {
+        isK(sk, e) ? unK(sk, e) : setK(sk, e, "self-declared");
+        S.act.push((isK(sk, e) ? "Now know: " : "Unmarked: ") + e);
+        render();
+      }
+      const _r4 = render;
+      render = function () {
+        syncItems();
+        _r4();
+      };
+      /* SKILLS UI */
+      const chip = (sk, e, k) =>
+        `<span class="chip ${k ? "k" : ""}" title="${esc(k ? "Proof: " + S.known[sk][e] : "Not known yet. Click to mark as known (self-declared).")}" onclick="flip('${q(sk)}','${q(e)}')">${esc(e)}</span>`;
+      function skillsUI() {
+        $("sk").innerHTML = S.skills.length
+          ? S.skills
+              .map((s) => {
+                const es = elems(s.name),
+                  K = es.filter((e) => isK(s.name, e)),
+                  U = es.filter((e) => !isK(s.name, e));
+                return `<div style="margin-bottom:16px"><div class="row" style="margin-bottom:4px"><a href="#" onclick="skillPanel('${s.id}');return false"><b>${esc(s.name)}</b></a><span class="m">KNOWS ${K.length} OF ${es.length}</span></div><div class="bar" style="margin-bottom:6px"><i style="width:${es.length ? (K.length / es.length) * 100 : 0}%"></i></div><div>${K.map((e) => chip(s.name, e, 1)).join("")}${U.map((e) => chip(s.name, e, 0)).join("")}</div><button class="x2" onclick="addKnown('${q(s.name)}')">+ add what I know</button></div>`;
+              })
+              .join("")
+          : '<div class="m">No skills yet. Upload a repo in Projects, or add a skill.</div>';
+      }
+      function skillPanel(id) {
+        const s = S.skills.find((x) => x.id === id),
+          es = elems(s.name),
+          K = es.filter((e) => isK(s.name, e)),
+          U = es.filter((e) => !isK(s.name, e));
+        sel = null;
+        $("panel").classList.add("open");
+        $("panel").innerHTML =
+          `<div class="row"><h2>${esc(s.name)}</h2><button onclick="$('panel').classList.remove('open')">Close</button></div><div class="m">WHAT YOU KNOW (${K.length})</div>${K.map((e) => `<div class="card"><b>${esc(e)}</b><br><span class="m">Proof: ${esc(S.known[s.name][e])}</span><br><button class="x2" onclick="flip('${q(s.name)}','${q(e)}');skillPanel('${id}')">Not actually known</button></div>`).join("") || '<div class="m">Nothing marked yet.</div>'}<div class="m" style="margin-top:10px">STILL TO LEARN (${U.length})</div>${U.map((e) => `<div class="row"><span>${esc(e)}</span><button class="x2" onclick="flip('${q(s.name)}','${q(e)}');skillPanel('${id}')">I know this</button></div>`).join("") || '<div class="m">All covered.</div>'}<div class="m" style="margin-top:10px">ROADMAP NODES USING THIS</div>${
+            S.nodes
+              .filter((n) => n.sk.includes(s.name))
+              .map(
+                (n) =>
+                  `<div><a href="#" onclick="openNode('${n.id}');return false">${esc(n.t)}</a></div>`,
+              )
+              .join("") || '<div class="m">none</div>'
+          }<button style="margin-top:12px" onclick="S.skills=S.skills.filter(x=>x.id!=='${id}');$('panel').classList.remove('open');render()">Delete skill</button>`;
+      }
+      function addSkill(pre) {
+        form(
+          "Add skill",
+          [
+            { k: "name", l: "Skill name", v: pre || "" },
+            { k: "els", l: "Things you already know in it (comma separated)" },
+            {
+              k: "src",
+              l: "How you know it (repo, certificate, project, course, self)",
+              v: "self-declared",
+            },
+          ],
+          (d) => {
+            if (!d.name) return;
+            let s = S.skills.find(
+              (x) => x.name.toLowerCase() === d.name.toLowerCase(),
+            );
+            if (!s) {
+              s = mkSk(d.name);
+              S.skills.push(s);
+            }
+            d.els
+              .split(",")
+              .map((x) => x.trim())
+              .filter(Boolean)
+              .forEach((e) => {
+                if (!elems(s.name).includes(e))
+                  (S.extra[s.name] = S.extra[s.name] || []).push(e);
+                setK(s.name, e, d.src || "self-declared");
+              });
+            S.act.push("Added skill " + s.name);
+            render();
+          },
+        );
+      }
+      function addKnown(sk) {
+        form(
+          "Add what you know in " + sk,
+          [
+            { k: "e", l: "Element (a concept, tool or technique)" },
+            {
+              k: "src",
+              l: "Proof (repo path, certificate, project)",
+              v: "self-declared",
+            },
+          ],
+          (d) => {
+            if (!d.e) return;
+            if (!elems(sk).includes(d.e))
+              (S.extra[sk] = S.extra[sk] || []).push(d.e);
+            setK(sk, d.e, d.src || "self-declared");
+            S.act.push("Added to " + sk + ": " + d.e);
+            render();
+          },
+        );
+      }
+      /* REPO ANALYSIS: finds which elements the code actually uses, with the file path as proof. Pattern match = shows usage, not mastery. */
+      const DET = [
+        ["Python", "functions & modules", /^\s*def\s/m, "py"],
+        [
+          "Python",
+          "list/dict comprehensions",
+          /\[[^\]\n]+\sfor\s[^\]\n]+\sin\s/,
+          "py",
+        ],
+        ["Python", "file & CSV I/O", /open\(|read_csv|csv\./, "py"],
+        ["Python", "classes & OOP", /^\s*class\s/m, "py"],
+        ["Python", "pandas DataFrames", /import pandas|from pandas/, "py"],
+        ["Python", "groupby & merge", /\.groupby\(|\.merge\(/, "py"],
+        [
+          "Python",
+          "matplotlib/seaborn plots",
+          /matplotlib|seaborn|plotly/,
+          "py",
+        ],
+        ["Python", "pytest testing", /import pytest|import unittest/, "py"],
+        [
+          "SQL",
+          "SELECT, WHERE, ORDER BY",
+          /\bselect\b[\s\S]{0,300}\bfrom\b/i,
+          "sql",
+        ],
+        ["SQL", "JOINs", /\bjoin\b/i, "sql"],
+        ["SQL", "GROUP BY & aggregates", /group by/i, "sql"],
+        [
+          "SQL",
+          "subqueries & CTEs",
+          /\bwith\s+\w+\s+as\s*\(|\(\s*select/i,
+          "sql",
+        ],
+        ["SQL", "window functions", /over\s*\(/i, "sql"],
+        [
+          "Stats",
+          "descriptive statistics",
+          /\.describe\(|\.mean\(|\.std\(/,
+          "py",
+        ],
+        [
+          "Stats",
+          "hypothesis tests",
+          /ttest|chi2|mannwhitney|p_value|f_oneway/i,
+          "py",
+        ],
+        [
+          "Stats",
+          "confidence intervals",
+          /conf_int|confidence interval|bootstrap/i,
+          "py",
+        ],
+        ["ML", "train/test split", /train_test_split/, "py"],
+        [
+          "ML",
+          "linear & logistic regression",
+          /LinearRegression|LogisticRegression/,
+          "py",
+        ],
+        [
+          "ML",
+          "decision trees & ensembles",
+          /RandomForest|GradientBoosting|xgboost|lightgbm|DecisionTree/,
+          "py",
+        ],
+        ["ML", "cross-validation", /cross_val|KFold|GridSearchCV/, "py"],
+        [
+          "ML",
+          "evaluation metrics",
+          /accuracy_score|f1_score|roc_auc|mean_squared_error|classification_report/,
+          "py",
+        ],
+        [
+          "ML",
+          "feature engineering",
+          /OneHotEncoder|StandardScaler|get_dummies|Pipeline/,
+          "py",
+        ],
+        ["DL", "PyTorch tensors & autograd", /import torch/, "py"],
+        ["DL", "training loops", /optimizer\.step|model\.fit/, "py"],
+        ["DL", "CNN basics", /Conv2d|Conv2D/, "py"],
+        [
+          "DL",
+          "fine-tuning a pretrained model",
+          /from_pretrained|pretrained=True/,
+          "py",
+        ],
+      ];
+      async function analyze(files) {
+        const all = [...files].filter(
+          (f) =>
+            !/(^|\/)(node_modules|\.git|venv|\.venv|dist|build|__pycache__|\.next)\//.test(
+              f.webkitRelativePath || "",
+            ),
+        );
+        if (!all.length) return;
+        const root =
+            (all[0].webkitRelativePath || "repo").split("/")[0] || "repo",
+          found = {},
+          before = snap();
+        let n = 0,
+          bud = 4e6;
+        const hit = (sk, e, p) => {
+          if (!found[sk + "|" + e]) found[sk + "|" + e] = [sk, e, p];
+        };
+        for (const f of all) {
+          const p = f.webkitRelativePath || f.name,
+            rel = p.split("/").slice(1).join("/") || p,
+            m = p.match(/\.([A-Za-z0-9]+)$/),
+            x = m ? m[1].toLowerCase() : "",
+            path = root + "/" + rel;
+          if (
+            /(^|\/)(tests?|__tests__)\//i.test(p) ||
+            /test_[^/]*\.py$|\.test\.[jt]sx?$/i.test(p)
+          )
+            hit("Projects", "tests", path);
+          if (/(^|\/)readme/i.test(p))
+            hit("Projects", "README with setup steps", path);
+          if (/\.github\/workflows\//.test(p))
+            hit("Projects", "CI workflow", path);
+          if (/requirements\.txt$|pyproject\.toml$/.test(p))
+            hit("Python", "virtual environments & pip", path);
+          if (/Dockerfile$/.test(p)) hit("Ops", "Docker", path);
+          if (!["py", "ipynb", "sql"].includes(x) || f.size > 3e5 || bud <= 0)
+            continue;
+          bud -= f.size;
+          n++;
+          let t = "";
+          try {
+            t = await f.text();
+          } catch (e) {
+            continue;
+          }
+          if (x === "ipynb") {
+            try {
+              t = JSON.parse(t)
+                .cells.filter((k) => k.cell_type === "code")
+                .map((k) => [].concat(k.source).join("\n"))
+                .join("\n");
+            } catch (e) {}
+          }
+          DET.forEach(([sk, e, re, only]) => {
+            if ((only === "sql") === (x === "sql") && re.test(t))
+              hit(sk, e, path);
+          });
+        }
+        const list = Object.values(found);
+        list.forEach(([sk, e, p]) => {
+          if (!S.skills.some((s) => s.name === sk)) S.skills.push(mkSk(sk));
+          if (!isK(sk, e)) setK(sk, e, "repo: " + p);
+        });
+        if (!S.projects.some((p) => p.t === root)) {
+          const has = (e) => list.some((l) => l[1] === e);
+          S.projects.push({
+            id: uid(),
+            t: root,
+            tags: [...new Set(list.map((l) => l[0]))].filter(
+              (x) => x !== "Projects",
+            ),
+            st: "Building",
+            rub: [
+              {
+                c: "README present",
+                p: has("README with setup steps") ? 1 : 0,
+              },
+              { c: "Tests present", p: has("tests") ? 1 : 0 },
+              { c: "CI configured", p: has("CI workflow") ? 1 : 0 },
+              { c: "At least 5 source files", p: n >= 5 ? 1 : 0 },
+            ],
+            sk: [...new Set(list.map((l) => l[0]))],
+            node: null,
+            ver: null,
+            req: false,
+          });
+        }
+        syncItems();
+        LASTREP = { root, n, list, d: diff(before, snap()) };
+        S.act.push(
+          "Analyzed repo " + root + ": " + list.length + " elements found",
+        );
+        render();
+      }
+      function projUI() {
+        let rep = "";
+        if (LASTREP) {
+          const g = {};
+          LASTREP.list.forEach(([s, e, p]) => (g[s] = g[s] || []).push([e, p]));
+          rep = `<div class="card" style="border-color:var(--red)"><b>Repo analysis: ${esc(LASTREP.root)}</b><div class="m">${LASTREP.n} files read in your browser. Nothing is uploaded.</div>${
+            Object.keys(g)
+              .map(
+                (s) =>
+                  `<div style="margin-top:8px"><b>${esc(s)}</b>${g[s].map(([e, p]) => `<div class="row" style="margin:2px 0"><span>${esc(e)}</span><span class="m">${esc(p)}</span></div>`).join("")}</div>`,
+              )
+              .join("") ||
+            '<div class="m">No known elements found in this folder.</div>'
+          }<div class="m" style="margin-top:8px">Roadmap impact: ${esc(LASTREP.d || "no change")}</div><div class="m">Pattern matching shows usage, not mastery. Undo anything wrong from Skills.</div></div>`;
+        }
+        $("proj").insertAdjacentHTML(
+          "afterbegin",
+          `<div class="card"><b>Upload a repo folder</b><div class="m">Guide reads the code, lists the elements you actually use with file paths as proof, adds them to Skills, and shrinks your roadmap to match.</div><input type="file" webkitdirectory multiple onchange="analyze(this.files)" style="margin-top:8px"></div>${rep}`,
+        );
+      }
+      /* GUIDE: live model (server proxy) when available, offline rules otherwise */
+      let LIVE = false;
+      const brief = () => ({
+        role: S.p.role,
+        hours: S.p.hours,
+        budget: S.p.budget,
+        weeks: S.p.weeks,
+        roles: Object.keys(ROLE),
+        skills: Object.fromEntries(
+          S.skills.map((s) => [
+            s.name,
+            {
+              known: Object.keys(S.known[s.name] || {}),
+              missing: elems(s.name).filter((e) => !isK(s.name, e)),
+            },
+          ]),
+        ),
+        nodes: S.nodes.map((n) => ({
+          id: n.id,
+          title: n.t,
+          skill: n.sk[0],
+          left: tot(n) - dn(n),
+        })),
+      });
+      function applyAI(j) {
+        const before = snap();
+        (j.actions || []).forEach((a) => {
+          try {
+            if (a.type === "know" || a.type === "forget") {
+              const sk = S.skills.find(
+                  (s) => s.name.toLowerCase() === String(a.skill).toLowerCase(),
+                ),
+                name = sk ? sk.name : String(a.skill).slice(0, 30);
+              if (!sk) S.skills.push(mkSk(name));
+              let el = elems(name).find(
+                (e) => e.toLowerCase() === String(a.element).toLowerCase(),
+              );
+              if (!el) {
+                el = String(a.element).slice(0, 60);
+                (S.extra[name] = S.extra[name] || []).push(el);
+              }
+              a.type === "know" ? setK(name, el, "told Guide") : unK(name, el);
+            } else if (a.type === "role") {
+              S.p.role = String(a.role).slice(0, 40);
+            } else if (a.type === "profile") {
+              ["hours", "budget", "weeks"].forEach((k) => {
+                if (a[k] !== undefined && +a[k] >= 0) S.p[k] = +a[k];
+              });
+            } else if (
+              a.type === "addNode" &&
+              a.title &&
+              a.skill &&
+              Array.isArray(a.elements)
+            ) {
+              const id = "x" + uid(),
+                sk = String(a.skill).slice(0, 30);
+              S.extra[sk] = (S.extra[sk] || []).concat(
+                a.elements
+                  .map((x) => String(x).slice(0, 60))
+                  .filter((x) => !(ELEM[sk] || []).includes(x)),
+              );
+              S.nodes.push({
+                id,
+                t: String(a.title).slice(0, 40),
+                ph: "Specialization",
+                h: 25,
+                paid: 0,
+                req: S.nodes.some((n) => n.id === a.after) ? [a.after] : [],
+                sk: [sk],
+                pr: 2,
+                custom: 1,
+                notes: "",
+                items: [],
+              });
+            }
+          } catch (e) {}
+        });
+        adapt(true);
+        render();
+        const d = diff(before, snap());
+        if (d) S.act.push("Roadmap adapted: " + d);
+        say(
+          esc(j.say || "Updated.") +
+            (d ? '<div class="m">Roadmap change: ' + esc(d) + "</div>" : ""),
+        );
+      }
+      function rules(t) {
+        const l = t.toLowerCase(),
+          before = snap();
+        const nd = S.nodes.find(
+          (x) =>
+            /finish|complete|done/.test(l) &&
+            (l.includes(x.sk[0].toLowerCase()) ||
+              l.includes(x.t.toLowerCase().split(" ")[0])),
+        );
+        if (nd) {
+          stat(nd.id, "done");
+          say(
+            "Marked everything in " +
+              esc(nd.t) +
+              " as known. It stays unverified until a mentor signs off.",
+          );
+          return 1;
+        }
+        const m = l.match(
+          /(become|switch to|change (my )?(role|goal) to|want to be)\s+(an? )?(.+)/,
+        );
+        if (m && /analy|ml eng|data sci|machine learning/.test(m[5])) {
+          S.p.role = /analy/.test(m[5])
+            ? "Data Analyst"
+            : /ml|machine/.test(m[5])
+              ? "ML Engineer"
+              : "Data Scientist";
+          const d = adapt(false);
+          render();
+          say(
+            "Role set to " +
+              S.p.role +
+              ". " +
+              (d
+                ? "Roadmap change: " + esc(d) + "."
+                : "The roadmap already fits."),
+          );
+          return 1;
+        }
+        if (
+          /\b(i know|i can|i have used|i learned|i already know|i use|i studied)\b/.test(
+            l,
+          )
+        ) {
+          const bad = [
+              "know",
+              "learned",
+              "already",
+              "studied",
+              "have",
+              "used",
+              "with",
+              "this",
+              "that",
+              "what",
+              "about",
+              "basic",
+              "basics",
+            ],
+            tk = l
+              .replace(/[^a-z0-9 &]/g, " ")
+              .split(/\s+/)
+              .filter((w) => w.length >= 4 && !bad.includes(w));
+          let best = [],
+            bs = 0;
+          S.skills.forEach((s) =>
+            elems(s.name).forEach((e) => {
+              const el = e.toLowerCase(),
+                sc = tk.filter((w) => el.includes(w)).length;
+              if (sc > bs) {
+                bs = sc;
+                best = [[s.name, e]];
+              } else if (sc && sc === bs) best.push([s.name, e]);
+            }),
+          );
+          if (bs) {
+            best = best.slice(0, 3);
+            best.forEach(([sk, e]) => setK(sk, e, "told Guide"));
+            adapt(true);
+            render();
+            const d = diff(before, snap());
+            say(
+              "Added to what you know: " +
+                best.map((x) => esc(x[1])).join(", ") +
+                ". " +
+                (d ? esc(d) + ". " : "") +
+                "Tap a chip in Skills to undo.",
+            );
+            return 1;
+          }
+          say(
+            "I could not match that to a known element. Use “+ add what I know” in Skills, or run the local server so the live model can read free text.",
+          );
+          return 1;
+        }
+        return 0;
+      }
+      const _h = handle;
+      handle = function (t) {
+        return S.nodes.length && S.p.role && S.p.hours && S.p.weeks
+          ? guide(t)
+          : _h(t);
+      };
+      async function guide(t) {
+        if (LIVE) {
+          const b = say('<span class="m">Thinking</span>');
+          try {
+            const r = await fetch("/api/guide", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: t, state: brief() }),
+              }),
+              j = await r.json();
+            b.remove();
+            if (j && j.actions) return applyAI(j);
+          } catch (e) {
+            b.remove();
+          }
+        }
+        if (!rules(t)) _h(t);
+      }
+      fetch("/api/health")
+        .then((r) => r.json())
+        .then((j) => {
+          LIVE = !!(j && j.ok);
+          $("live").textContent = LIVE
+            ? "Guide: live model"
+            : "Guide: offline rules";
+        })
+        .catch(() => {});
+      document
+        .querySelector("header .sp")
+        .insertAdjacentHTML(
+          "afterend",
+          '<span class="badge" id="live">Guide: offline rules</span>',
+        );
+      if (!S || !S.nodes || !S.known) seed();
+      else {
+        S.extra = S.extra || {};
+        relayout();
+        syncItems();
+      }
+
+      /* SERVER LAYER: state persistence, shared mentor reviews, realtime group chat */
+      const originalFetch = window.fetch;
+      window.fetch = async (...args) => {
+        let [resource, config] = args;
+        const token = localStorage.getItem('ct_token');
+        if (typeof resource === 'string' && resource.startsWith('/api/') && token) {
+          config = config || {};
+          config.headers = { ...config.headers, 'Authorization': `Bearer ${token}` };
+        }
+        const res = await originalFetch(resource, config);
+        if (res.status === 401 && !window.location.pathname.includes('/mentor')) {
+          localStorage.removeItem('ct_token');
+          window.location.replace('/login');
+        }
+        return res;
+      };
+      const api = (u, o) => fetch(u, o).then((r) => r.json());
+      var LAY = "h";
+      let SRV = false,
+        LOADED = false,
+        RVS = {},
+        CH = {},
+        FORGE = null,
+        spt = null;
+      const jh = { "Content-Type": "application/json" };
+      function putEntries(ent) {
+        fetch("/api/rv", {
+          method: "PUT",
+          headers: jh,
+          body: JSON.stringify({ entries: ent }),
+        }).catch(() => {});
+      }
+      function pushRV(o) {
+        if (!SRV) return;
+        const ch = {};
+        Object.keys(o).forEach((k) => {
+          const s = JSON.stringify(o[k]);
+          if (RVS[k] !== s) {
+            ch[k] = o[k];
+            RVS[k] = s;
+          }
+        });
+        if (Object.keys(ch).length) putEntries(ch);
+      }
+      function pushState() {
+        if (!SRV || !LOADED || isMentor()) return;
+        clearTimeout(spt);
+        spt = setTimeout(
+          () =>
+            fetch("/api/state", {
+              method: "PUT",
+              headers: jh,
+              body: JSON.stringify({ state: S }),
+            }).catch(() => {}),
+          600,
+        );
+      }
+      async function pullRV() {
+        const j = await api("/api/rv"),
+          srv = j.store || {};
+        Object.keys(srv).forEach((k) => (RVS[k] = JSON.stringify(srv[k])));
+        try {
+          localStorage.setItem("ct_rv", JSON.stringify(srv));
+        } catch (e) {}
+        if (isMentor()) {
+          window.mdraw && mdraw();
+        } else studentSync();
+      }
+      function connect() {
+        api("/api/rv")
+          .then((j) => {
+            const srv = j.store || {},
+              loc = RV(),
+              only = {};
+            Object.keys(srv).forEach((k) => (RVS[k] = JSON.stringify(srv[k])));
+            Object.keys(loc).forEach((k) => {
+              if (!srv[k]) only[k] = loc[k];
+            });
+            try {
+              localStorage.setItem(
+                "ct_rv",
+                JSON.stringify({ ...srv, ...only }),
+              );
+            } catch (e) {}
+            if (Object.keys(only).length) {
+              Object.keys(only).forEach(
+                (k) => (RVS[k] = JSON.stringify(only[k])),
+              );
+              putEntries(only);
+            }
+            if (isMentor()) window.mdraw && mdraw();
+            else studentSync();
+          })
+          .catch(() => {});
+        if (!isMentor())
+          api("/api/state")
+            .then((j) => {
+              if (j.state && j.state.nodes && (j.state.ts || 0) > (S.ts || 0)) {
+                S = j.state;
+                S.extra = S.extra || {};
+                S.known = S.known || {};
+                relayout();
+                syncItems();
+                render();
+              }
+              LOADED = true;
+              pushState();
+            })
+            .catch(() => {
+              LOADED = true;
+            });
+        const tokenStr = localStorage.getItem('ct_token') ? '?token=' + localStorage.getItem('ct_token') : '';
+        const es = new EventSource("/api/events" + tokenStr);
+        es.addEventListener("rv", () => pullRV().catch(() => {}));
+        es.addEventListener("chat", (e) => {
+          try {
+            const d = JSON.parse(e.data);
+            if (d.gid === R.ex) loadChat(d.gid, true);
+          } catch (x) {}
+        });
+      }
+      api("/api/health")
+        .then((j) => {
+          if (j && j.server) {
+            SRV = true;
+            connect();
+          }
+        })
+        .catch(() => {});
+      /* GROUP CHAT */
+      function loadChat(g, force) {
+        if (CH[g] && !force) return;
+        if (!CH[g]) CH[g] = [];
+        if (SRV)
+          api("/api/chat/" + g)
+            .then((j) => {
+              CH[g] = j.messages || [];
+              comm();
+            })
+            .catch(() => {});
+        else {
+          try {
+            CH[g] = JSON.parse(localStorage.getItem("ct_ch_" + g) || "[]");
+          } catch (e) {}
+        }
+      }
+      function chatUI() {
+        const g = R.ex;
+        if (!g) return;
+        const i = GRP.findIndex((x) => x.id === g),
+          card = $("grps").children[i];
+        if (!card) return;
+        const old = $("ci"),
+          val = old ? old.value : "",
+          foc = !!old && document.activeElement === old;
+        loadChat(g);
+        card.insertAdjacentHTML(
+          "beforeend",
+          `<div class="m" style="margin-top:8px">GROUP CHAT ${SRV ? "(realtime)" : "(this browser only; run the server for realtime)"}</div><div id="cl" style="max-height:140px;overflow:auto;margin:4px 0">${(CH[g] || []).map((m) => `<div><b>${esc(m.name)}</b> <span class="m">${new Date(m.t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</span><br>${esc(m.text)}</div>`).join("") || '<div class="m">No messages yet.</div>'}</div><div class="row"><input id="ci" placeholder="Message the group" onkeydown="if(event.key==='Enter')sendChat()"><button onclick="sendChat()">Send</button></div>`,
+        );
+        const n = $("ci");
+        if (n) {
+          n.value = val;
+          if (foc) n.focus();
+        }
+        const l = $("cl");
+        if (l) l.scrollTop = 1e9;
+      }
+      function sendChat() {
+        const g = R.ex,
+          t = ($("ci").value || "").trim();
+        if (!g || !t) return;
+        $("ci").value = "";
+        if (SRV)
+          fetch("/api/chat/" + g, {
+            method: "POST",
+            headers: jh,
+            body: JSON.stringify({ name: S.p.name, text: t }),
+          }).catch(() => {});
+        else {
+          (CH[g] = CH[g] || []).push({
+            name: S.p.name,
+            text: t,
+            t: Date.now(),
+          });
+          try {
+            localStorage.setItem("ct_ch_" + g, JSON.stringify(CH[g]));
+          } catch (e) {}
+          comm();
+        }
+      }
+      const _comm = comm;
+      comm = function () {
+        _comm();
+        chatUI();
+      };
+      /* PROJECT FORGE */
+      const FT = [
+        {
+          title: "Price-drop forecaster on your own scraper data",
+          hook: "Turn weeks of scraped prices into a forecast and prove it beats a naive baseline.",
+          whyYou:
+            "You already have a scraper, so the data pipeline exists. This adds modelling and honest evaluation.",
+          dataSource: "Your own scraped CSVs, at least 30 days of history.",
+          week1:
+            "Load the CSVs, build a rolling-mean baseline, plot its error.",
+          benchmark:
+            "Beat the naive baseline MAE by 10% on a held-out final week.",
+          rubric: [
+            "Baseline implemented",
+            "Time-based split, not random",
+            "Model beats baseline with numbers",
+            "Tests for the data loader",
+            "README with a results table",
+          ],
+          readme: [
+            "Problem",
+            "Data",
+            "Method",
+            "Results vs baseline",
+            "How to run",
+          ],
+        },
+        {
+          title: "Query-plan detective",
+          hook: "Load a public dataset into SQLite, write 10 analytics queries, then make them faster with indexes and measure it.",
+          whyYou:
+            "SQL is where your roadmap has the most gaps, and timing results are easy to defend in an interview.",
+          dataSource:
+            "Any open CSV dataset you download, imported into SQLite.",
+          week1:
+            "Import the data and write the first 3 queries with EXPLAIN output.",
+          benchmark:
+            "Cut median runtime of the 3 slowest queries by at least 3x.",
+          rubric: [
+            "10 queries with expected results",
+            "EXPLAIN before and after",
+            "Timing table in README",
+            "Uses a CTE and a window function",
+            "Script rebuilds the DB from scratch",
+          ],
+        },
+        {
+          title: "A/B test simulator and power calculator",
+          hook: "Simulate experiments to show how sample size, effect size and peeking change false-positive rates.",
+          whyYou:
+            "It makes hypothesis tests and intervals concrete, and you can show the plots.",
+          dataSource:
+            "Synthetic data you generate with a seeded random generator.",
+          week1:
+            "Simulate one experiment and compute a p-value and a confidence interval.",
+          benchmark:
+            "Reproduce a 5% false-positive rate under the null across 10,000 runs.",
+          rubric: [
+            "Seeded and reproducible",
+            "Null and effect scenarios",
+            "Power curve plot",
+            "Peeking experiment",
+            "README explains the findings",
+          ],
+        },
+      ];
+      async function forge() {
+        FORGE = { loading: 1 };
+        render();
+        let r = null;
+        if (LIVE) {
+          try {
+            r = await api("/api/forge", {
+              method: "POST",
+              headers: jh,
+              body: JSON.stringify({
+                state: brief(),
+                projects: S.projects.map((p) => ({ title: p.t, tags: p.tags })),
+              }),
+            });
+            if (r.error || !r.title) r = null;
+          } catch (e) {
+            r = null;
+          }
+        }
+        if (r) r.src = "live model";
+        else {
+          const w = S.skills
+            .map((s) => [s.name, total(s) ? know(s) / total(s) : 1])
+            .sort((a, b) => a[1] - b[1])[0];
+          r = {
+            ...(w && w[0] === "SQL"
+              ? FT[1]
+              : w && w[0] === "Stats"
+                ? FT[2]
+                : FT[0]),
+            src: "built-in template (run the server with a key for tailored ideas)",
+          };
+        }
+        FORGE = r;
+        render();
+      }
+      function addForge() {
+        const f = FORGE;
+        S.projects.push({
+          id: uid(),
+          t: String(f.title).slice(0, 80),
+          tags: [],
+          st: "Idea",
+          rub: (f.rubric || []).map((c) => ({ c: String(c), p: 0 })),
+          sk: [],
+          node: null,
+          ver: null,
+          req: false,
+          forge: f,
+        });
+        S.act.push("Added project idea " + f.title);
+        FORGE = null;
+        render();
+      }
+      const _pu = projUI;
+      projUI = function () {
+        _pu();
+        const f = FORGE,
+          card = !f
+            ? ""
+            : f.loading
+              ? '<div class="card m">Designing a project from your gaps...</div>'
+              : `<div class="card" style="border-color:var(--red)"><b>${esc(f.title)}</b><div class="m">${esc(f.src || "")}</div><p>${esc(f.hook || "")}</p><div class="m">WHY YOU</div>${esc(f.whyYou || "")}<div class="m" style="margin-top:6px">DATA</div>${esc(f.dataSource || "")}<div class="m" style="margin-top:6px">WEEK 1</div>${esc(f.week1 || "")}<div class="m" style="margin-top:6px">BENCHMARK</div>${esc(f.benchmark || "")}<div class="m" style="margin-top:6px">RUBRIC</div>${(f.rubric || []).map((x) => "<div>- " + esc(x) + "</div>").join("")}<div class="m" style="margin-top:6px">README OUTLINE</div>${(f.readme || []).map(esc).join(", ")}<div class="row"><button onclick="FORGE=null;render()">Dismiss</button><button class="p" onclick="addForge()">Add to my projects</button></div></div>`;
+        $("proj").insertAdjacentHTML(
+          "afterbegin",
+          '<div class="row" style="margin-top:0"><button class="p" onclick="forge()">Suggest a project</button><span class="m">Built from your missing skill elements</span></div>' +
+            card,
+        );
+      };
+      /* OUTREACH (under 300 characters) */
+      async function outreach(name) {
+        const m = MENT.find((x) => x.n === name) || {
+            n: name,
+            s: [],
+            t: "Peer",
+          },
+          pr = S.projects[0],
+          els = []
+            .concat(...Object.keys(S.known).map((k) => Object.keys(S.known[k])))
+            .slice(0, 3);
+        let note = "";
+        if (LIVE) {
+          try {
+            const r = await api("/api/outreach", {
+              method: "POST",
+              headers: jh,
+              body: JSON.stringify({
+                state: brief(),
+                mentor: { name: m.n, role: m.r, skills: m.s },
+                project: pr ? { title: pr.t, tags: pr.tags } : null,
+              }),
+            });
+            note = r.note || "";
+          } catch (e) {}
+        }
+        if (!note) {
+          const first = m.n.split(" ")[0].replace(/^Dr\.?$/, "Professor");
+          note = `Hi ${first}, I'm a ${S.p.college || "student"} student aiming for ${S.p.role || "a data role"}. I built ${pr ? pr.t : "a small project"}${els.length ? " using " + els.join(", ") : ""}. Could I ask you two questions about ${m.s[0] || "your path"}?`;
+          if (note.length > 299) note = note.slice(0, 296) + "...";
+        }
+        $("mf").innerHTML =
+          `<h2>Note to ${esc(m.n)}</h2><div class="m">${note.length} of 300 characters${LIVE ? "" : " (template; run the server with a key for a tailored note)"}</div><textarea id="ot" rows="5" style="margin:8px 0">${esc(note)}</textarea><div class="row"><button type="button" onclick="$('modal').classList.remove('open')">Close</button><button class="p">Copy and close</button></div>`;
+        $("mf").onsubmit = (e) => {
+          e.preventDefault();
+          try {
+            navigator.clipboard.writeText($("ot").value);
+          } catch (x) {}
+          $("modal").classList.remove("open");
+        };
+        $("modal").classList.add("open");
+      }
+      /* SENIOR GUIDANCE BOARD + NODE RESOURCES */
+      const SEN = {
+        py: [
+          {
+            by: "Arjun N.",
+            did: "Practised pandas on data I scraped myself instead of tutorial datasets.",
+            skip: "Skipped long OOP chapters until a project needed classes.",
+          },
+        ],
+        sql: [
+          {
+            by: "Ria K.",
+            did: "Worked on one messy real dataset; window functions came up in every interview.",
+            skip: "Did not memorise syntax. A cheatsheet is fine.",
+          },
+        ],
+        st: [
+          {
+            by: "Neha B.",
+            did: "Learned hypothesis testing by writing up one real A/B test.",
+            skip: "Skipped proofs. Focus on interpreting p-values and intervals.",
+          },
+        ],
+        ml: [
+          {
+            by: "Dr. S. Mehra",
+            did: "Built a simple baseline before every model and compared honestly.",
+            skip: "Skipped tuning until the data pipeline was solid.",
+          },
+        ],
+        dl: [
+          {
+            by: "Arjun N.",
+            did: "Fine-tuned a small pretrained model on my own data.",
+            skip: "Did not build every architecture from scratch.",
+          },
+        ],
+        cap: [
+          {
+            by: "Ria K.",
+            did: "Picked a problem with a measurable benchmark and wrote results in the README.",
+            skip: "Skipped a fancy UI. Recruiters read the README.",
+          },
+        ],
+        viz: [
+          {
+            by: "Neha B.",
+            did: "Rebuilt one dashboard three times with feedback from a non-technical friend.",
+            skip: "Skipped chart-library tours. Learn to choose the right chart.",
+          },
+        ],
+        ops: [
+          {
+            by: "Arjun N.",
+            did: "Dockerised one model and served it with a tiny API.",
+            skip: "Skipped Kubernetes. It is too early.",
+          },
+        ],
+      };
+      function senBoard(n) {
+        S.react = S.react || {};
+        return (
+          (SEN[n.id] || [])
+            .map((x, i) => {
+              const k = n.id + i;
+              return `<div class="card"><b>${esc(x.by)}</b><div class="m">WHAT I DID</div>${esc(x.did)}<div class="m" style="margin-top:6px">WHAT I'D SKIP</div>${esc(x.skip)}<div class="row"><button class="x2" onclick="S.react['${k}']=(S.react['${k}']||0)+1;render()">Helpful (${S.react[k] || 0})</button><span><input id="fq${k}" placeholder="Ask a follow-up" style="width:150px"> <button class="x2" onclick="askSen('${k}','${esc(x.by)}')">Ask</button></span></div></div>`;
+            })
+            .join("") ||
+          '<div class="m">No notes from seniors for this node yet.</div>'
+        );
+      }
+      function askSen(k, by) {
+        const v = ($("fq" + k).value || "").trim();
+        if (!v) return;
+        S.follow = (S.follow || []).concat({ by, q: v });
+        S.act.push("Asked " + by + ": " + v);
+        render();
+      }
+      const resTab = (n) =>
+        CRS.filter((c) => c.sk.some((s) => n.sk.includes(s)))
+          .map(
+            (c) =>
+              `<div class="card"><b>${esc(c.t)}</b><br><span class="m">${esc(c.pv)}, ${c.tier}, Rs ${c.c}, ${c.h}h</span><br><button class="x2" ${added(c.id) ? "disabled" : ""} onclick="R.sel['${c.id}']='${n.id}';addC('${c.id}')">${added(c.id) ? "Added" : "Add to checklist"}</button></div>`,
+          )
+          .join("") ||
+        '<div class="m">No catalogued courses for this node.</div>';
+      /* LAYOUT: horizontal or vertical, plus a 3D tilt view */
+      function relayout() {
+        const ids = S.nodes.map((n) => n.id),
+          d = {},
+          dep = (n) =>
+            d[n.id] !== undefined
+              ? d[n.id]
+              : (d[n.id] =
+                  1 +
+                  Math.max(
+                    -1,
+                    ...n.req
+                      .filter((r) => ids.includes(r))
+                      .map((r) => dep(S.nodes.find((x) => x.id === r))),
+                  ));
+        S.nodes.forEach(dep);
+        const cols = {};
+        S.nodes.forEach((n) => {
+          (cols[d[n.id]] = cols[d[n.id]] || []).push(n);
+        });
+        Object.keys(cols).forEach((k) =>
+          cols[k].forEach((n, i) => {
+            const L = cols[k].length;
+            POS[n.id] =
+              LAY !== "v"
+                ? [10 + k * 200, L === 1 ? 90 : 20 + i * 140]
+                : [400 - 85 + (i - (L - 1) / 2) * 190, 10 + k * 105];
+          }),
+        );
+      }
+      function setLay() {
+        LAY = LAY !== "v" ? "v" : "h";
+        relayout();
+        $("lay").textContent =
+          LAY !== "v" ? "Vertical layout" : "Horizontal layout";
+        render();
+      }
+      function tilt() {
+        $("rm").classList.toggle("t3");
+      }
+      $("flt").insertAdjacentHTML(
+        "afterend",
+        ' <button id="lay" onclick="setLay()">Vertical layout</button> <button onclick="tilt()">3D tilt view</button>',
+      );
+      /* EXPORT / IMPORT, SHORTCUTS */
+      function exportJSON() {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(
+          new Blob([JSON.stringify(S, null, 1)], { type: "application/json" }),
+        );
+        a.download = "careertrace.json";
+        a.click();
+      }
+      function importJSON(f) {
+        if (!f) return;
+        f.text().then((t) => {
+          try {
+            const j = JSON.parse(t);
+            if (!j.nodes || !j.p) throw 0;
+            S = j;
+            S.extra = S.extra || {};
+            S.known = S.known || {};
+            relayout();
+            syncItems();
+            render();
+          } catch (e) {
+            alert("That file is not a CareerTrace export.");
+          }
+        });
+      }
+      $("profile").insertAdjacentHTML(
+        "beforeend",
+        '<div class="row" style="justify-content:flex-start;margin-top:10px"><button onclick="exportJSON()">Export JSON</button><button onclick="$(\'imp\').click()">Import JSON</button><input id="imp" type="file" accept=".json" style="display:none" onchange="importJSON(this.files[0])"></div><div class="m">Shortcuts: G then D profile, R roadmap, S skills, P projects, C community, M people</div>',
+      );
+      let gk = 0;
+      addEventListener("keydown", (e) => {
+        if (/INPUT|TEXTAREA|SELECT/.test(e.target.tagName)) return;
+        if (e.key === "g") {
+          gk = Date.now();
+          return;
+        }
+        if (Date.now() - gk < 1200) {
+          const t = {
+            d: "profile",
+            r: "roadmap",
+            s: "skills",
+            p: "projects",
+            c: "community",
+            m: "people",
+          }[e.key];
+          if (t && $(t)) $(t).scrollIntoView({ behavior: "smooth" });
+          gk = 0;
+        }
+      });
+
+      if (isMentor()) mentorView();
+      else {
+        render();
+        studentSync();
+      }
+    </script>
+    <style>
+      #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 99999; display: flex; flex-direction: column; gap: 10px; }
+      .toast { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; font-size: 14px; min-width: 250px;}
+      .toast.show { opacity: 1; transform: translateY(0); }
+      .toast.success { border-left: 4px solid #a4c244; }
+      .toast.error { border-left: 4px solid #e74c3c; }
+    </style>
+    <div id="toast-container"></div>
+    <script>
+      window.showToast = function(msg, type='success') {
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => toast.classList.add('show'), 10);
+        setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+      };
+      
+      function logout() {
+        localStorage.removeItem('ct_token');
+        localStorage.removeItem('ct_user');
+        window.location.replace('/login');
+      }
+
+      // Initial Welcome Toast
+      if (localStorage.getItem('ct_user')) {
+        try {
+          const u = JSON.parse(localStorage.getItem('ct_user'));
+          if (!window.sessionStorage.getItem('welcomed')) {
+            setTimeout(() => window.showToast('Welcome back, ' + u.username + '!'), 500);
+            window.sessionStorage.setItem('welcomed', '1');
+          }
+        } catch(e) {}
+      }
+    </script>
+  </body>
+</html>

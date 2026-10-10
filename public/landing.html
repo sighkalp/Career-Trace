@@ -1,0 +1,672 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CareerTrace — AI-Powered Career Roadmaps</title>
+  <meta name="description" content="Map your career with AI. Get personalized learning roadmaps, track skills, build real projects, and land your dream role.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: #06070a;
+      color: #f0f0f5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 14px 48px;
+      display: flex; align-items: center; justify-content: space-between;
+      backdrop-filter: blur(24px) saturate(1.4);
+      -webkit-backdrop-filter: blur(24px) saturate(1.4);
+      background: rgba(6,7,10,0.65);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      transition: background 0.4s, box-shadow 0.4s;
+    }
+    .navbar.scrolled {
+      background: rgba(6,7,10,0.92);
+      box-shadow: 0 4px 30px rgba(0,0,0,0.4);
+    }
+    .logo {
+      font-size: 20px; font-weight: 800; letter-spacing: -0.04em;
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: #f0f0f5;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: linear-gradient(135deg, #6b7d3a, #a4c244);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: #fff; font-weight: 800;
+      box-shadow: 0 2px 12px rgba(107,125,58,0.35);
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: #6b6f7b; text-decoration: none; font-size: 14px; font-weight: 500;
+      transition: color 0.25s; position: relative;
+    }
+    .nav-links a:hover { color: #e0e0e8; }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+      background: linear-gradient(90deg, #6b7d3a, #a4c244);
+      border-radius: 1px; transition: width 0.3s;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 22px; border-radius: 10px; font-size: 14px; font-weight: 600;
+      text-decoration: none; transition: all 0.25s ease; cursor: pointer; border: none;
+      font-family: inherit;
+    }
+    .btn-ghost {
+      background: transparent; color: #b0b4bc;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .btn-ghost:hover {
+      background: rgba(255,255,255,0.06); color: #f0f0f5;
+      border-color: rgba(255,255,255,0.16);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #5c6e30, #7a9140, #6b7d3a);
+      color: #fff;
+      box-shadow: 0 2px 20px rgba(107,125,58,0.3), inset 0 1px 0 rgba(255,255,255,0.12);
+    }
+    .btn-primary:hover {
+      box-shadow: 0 4px 32px rgba(107,125,58,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+    }
+    .btn-large { padding: 15px 32px; font-size: 16px; border-radius: 12px; }
+
+    /* ── Hero ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center; padding: 140px 40px 100px; overflow: hidden;
+    }
+    #hero-canvas {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+    }
+    .hero-glow {
+      position: absolute; width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(107,125,58,0.12) 0%, rgba(107,125,58,0.03) 40%, transparent 70%);
+      top: 40%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none; z-index: 0;
+      animation: glowPulse 6s ease-in-out infinite;
+    }
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.8; transform: translate(-50%,-50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%,-50%) scale(1.1); }
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 820px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 18px; border-radius: 99px;
+      background: rgba(107,125,58,0.12);
+      border: 1px solid rgba(107,125,58,0.25);
+      color: #a4c244; font-size: 13px; font-weight: 600;
+      margin-bottom: 28px; letter-spacing: 0.02em;
+    }
+    .hero-badge .dot {
+      width: 7px; height: 7px; background: #a4c244;
+      border-radius: 50%; animation: pulse 2s ease-in-out infinite;
+      box-shadow: 0 0 8px rgba(164,194,68,0.5);
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+    .hero h1 {
+      font-size: clamp(44px, 6.5vw, 78px); font-weight: 900;
+      letter-spacing: -0.05em; line-height: 1.02; margin-bottom: 24px;
+    }
+    .hero h1 .gradient {
+      background: linear-gradient(135deg, #8fa35a 10%, #c8e06a 50%, #6b7d3a 90%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      background-size: 200% 200%;
+      animation: gradientShift 5s ease-in-out infinite;
+    }
+    @keyframes gradientShift {
+      0%,100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+    .hero p {
+      font-size: 19px; color: #7a7e88; line-height: 1.65;
+      max-width: 580px; margin: 0 auto 40px;
+    }
+    .hero-cta { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    .hero-preview {
+      margin-top: 60px; position: relative;
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 20px 80px -20px rgba(0,0,0,0.8), 0 0 60px -10px rgba(107,125,58,0.15);
+      max-width: 900px; margin-left: auto; margin-right: auto;
+    }
+    .hero-preview img {
+      width: 100%; display: block; opacity: 0.85;
+      transition: opacity 0.4s;
+    }
+    .hero-preview:hover img { opacity: 1; }
+    .hero-preview::before {
+      content: ''; position: absolute; inset: 0;
+      background: linear-gradient(180deg, transparent 60%, rgba(6,7,10,0.9));
+      z-index: 1; pointer-events: none;
+    }
+
+    /* ── Marquee ── */
+    .marquee-section {
+      padding: 40px 0; border-top: 1px solid rgba(255,255,255,0.04);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      overflow: hidden; position: relative;
+    }
+    .marquee-track {
+      display: flex; gap: 48px; animation: marquee 25s linear infinite;
+      width: max-content;
+    }
+    .marquee-track span {
+      font-size: 14px; font-weight: 600; color: #3a3d46;
+      white-space: nowrap; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    @keyframes marquee { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+
+    /* ── Features ── */
+    .features { padding: 140px 48px; max-width: 1240px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.14em; color: #8fa35a; margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(34px, 4.5vw, 52px); font-weight: 800;
+      letter-spacing: -0.035em; margin-bottom: 14px; line-height: 1.1;
+    }
+    .section-desc {
+      font-size: 17px; color: #5a5e68; max-width: 540px;
+      line-height: 1.65; margin-bottom: 64px;
+    }
+    .features-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;
+    }
+    .feature-card {
+      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(255,255,255,0.05);
+      border-radius: 20px; padding: 36px 30px;
+      transition: all 0.35s ease; position: relative; overflow: hidden;
+    }
+    .feature-card::after {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(143,163,90,0.5), transparent);
+      opacity: 0; transition: opacity 0.35s;
+    }
+    .feature-card:hover::after { opacity: 1; }
+    .feature-card:hover {
+      background: rgba(255,255,255,0.045);
+      border-color: rgba(107,125,58,0.2);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.4);
+    }
+    .feature-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(107,125,58,0.18), rgba(107,125,58,0.04));
+      border: 1px solid rgba(107,125,58,0.15);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin-bottom: 22px;
+    }
+    .feature-card h3 {
+      font-size: 17px; font-weight: 700; margin-bottom: 10px; letter-spacing: -0.01em;
+    }
+    .feature-card p { font-size: 14px; color: #5a5e68; line-height: 1.6; }
+
+    /* ── How it works ── */
+    .how-it-works { padding: 140px 48px; max-width: 1240px; margin: 0 auto; }
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 32px; margin-top: 64px; position: relative;
+    }
+    .steps::before {
+      content: ''; position: absolute; top: 48px; left: 16%; right: 16%;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(107,125,58,0.05), rgba(107,125,58,0.25), rgba(107,125,58,0.05));
+    }
+    .step { text-align: center; position: relative; }
+    .step-num {
+      width: 96px; height: 96px; border-radius: 50%;
+      background: rgba(107,125,58,0.06);
+      border: 2px solid rgba(107,125,58,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 30px; font-weight: 900; color: #a4c244;
+      margin: 0 auto 28px; position: relative; z-index: 1;
+      transition: all 0.35s;
+    }
+    .step:hover .step-num {
+      background: rgba(107,125,58,0.12);
+      border-color: rgba(107,125,58,0.4);
+      box-shadow: 0 0 30px rgba(107,125,58,0.2);
+      transform: scale(1.08);
+    }
+    .step h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+    .step p { font-size: 14px; color: #5a5e68; line-height: 1.65; max-width: 280px; margin: 0 auto; }
+
+    /* ── Stats ── */
+    .stats {
+      padding: 80px 48px;
+      background: linear-gradient(180deg, rgba(107,125,58,0.04) 0%, rgba(6,7,10,0) 100%);
+      border-top: 1px solid rgba(107,125,58,0.08);
+      border-bottom: 1px solid rgba(107,125,58,0.08);
+    }
+    .stats-grid {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+      text-align: center;
+    }
+    .stat-item h3 {
+      font-size: 46px; font-weight: 900; letter-spacing: -0.04em;
+      background: linear-gradient(135deg, #8fa35a, #c8e06a);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .stat-item p { font-size: 14px; color: #5a5e68; margin-top: 6px; font-weight: 500; }
+
+    /* ── Testimonial ── */
+    .testimonial {
+      padding: 120px 48px; max-width: 800px; margin: 0 auto; text-align: center;
+    }
+    .testimonial blockquote {
+      font-size: 24px; font-weight: 500; letter-spacing: -0.02em;
+      line-height: 1.5; color: #c0c4cc; margin-bottom: 28px; font-style: normal;
+    }
+    .testimonial cite {
+      font-style: normal; font-size: 14px; color: #5a5e68;
+    }
+    .testimonial cite strong { color: #8fa35a; }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 140px 48px; text-align: center; position: relative;
+    }
+    .cta-glow {
+      position: absolute; width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(107,125,58,0.1) 0%, transparent 65%);
+      top: 50%; left: 50%; transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+    .cta-section h2 {
+      font-size: clamp(34px, 4.5vw, 52px); font-weight: 800;
+      letter-spacing: -0.035em; margin-bottom: 16px; position: relative;
+    }
+    .cta-section p {
+      font-size: 18px; color: #5a5e68; margin-bottom: 40px; position: relative;
+    }
+    .cta-section .btn { position: relative; }
+
+    /* ── Footer ── */
+    footer {
+      padding: 32px 48px; border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .footer-inner {
+      max-width: 1240px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    footer p { font-size: 13px; color: #3a3d46; }
+    .footer-links { display: flex; gap: 28px; }
+    .footer-links a {
+      font-size: 13px; color: #5a5e68; text-decoration: none;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #c0c4cc; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .navbar { padding: 12px 20px; }
+      .nav-links { display: none; }
+      .hero { padding: 120px 20px 60px; }
+      .features, .how-it-works { padding: 80px 20px; }
+      .features-grid { grid-template-columns: 1fr; gap: 12px; }
+      .steps { grid-template-columns: 1fr; gap: 40px; }
+      .steps::before { display: none; }
+      .stats { padding: 60px 20px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 28px; }
+      .cta-section { padding: 80px 20px; }
+      footer .footer-inner { flex-direction: column; gap: 16px; }
+    }
+    @media (max-width: 480px) {
+      .btn-large { width: 100%; justify-content: center; }
+      .hero-cta { flex-direction: column; align-items: center; }
+    }
+
+    /* ── Animations ── */
+    .reveal { opacity: 0; transform: translateY(40px); }
+
+    /* ── Smooth scroll indicator ── */
+    .scroll-hint {
+      position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+      z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 8px;
+      color: #4a4e58; font-size: 12px; font-weight: 500;
+      animation: scrollBounce 2.5s ease-in-out infinite;
+    }
+    .scroll-hint svg { opacity: 0.5; }
+    @keyframes scrollBounce {
+      0%,100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar" id="navbar">
+    <a href="/" class="logo">
+      <div class="logo-icon">CT</div>
+      CareerTrace
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How it works</a></li>
+      <li><a href="#stats">Results</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/login" class="btn btn-ghost">Log in</a>
+      <a href="/register" class="btn btn-primary">Get Started</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" id="hero-section">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-glow"></div>
+    <div class="hero-content">
+      <div class="hero-badge reveal">
+        <span class="dot"></span>
+        AI-Powered Career Planning
+      </div>
+      <h1 class="reveal">
+        Map Your<br><span class="gradient">Career Path</span>
+      </h1>
+      <p class="reveal">
+        Personalized learning roadmaps powered by AI. Track your skills, build real projects, get mentor feedback, and land your dream role — all in one place.
+      </p>
+      <div class="hero-cta reveal">
+        <a href="/register" class="btn btn-primary btn-large">Get Started Free&ensp;→</a>
+        <a href="/login" class="btn btn-ghost btn-large">Sign In</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span>Scroll</span>
+      <svg width="16" height="24" viewBox="0 0 16 24" fill="none"><rect x="1" y="1" width="14" height="22" rx="7" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" fill="currentColor"><animate attributeName="cy" values="7;14;7" dur="2s" repeatCount="indefinite"/></circle></svg>
+    </div>
+  </section>
+
+  <!-- Marquee -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span>PYTHON</span><span>·</span><span>SQL</span><span>·</span>
+      <span>MACHINE LEARNING</span><span>·</span><span>DEEP LEARNING</span><span>·</span>
+      <span>STATISTICS</span><span>·</span><span>DATA SCIENCE</span><span>·</span>
+      <span>PORTFOLIO PROJECTS</span><span>·</span><span>MENTOR REVIEWS</span><span>·</span>
+      <span>AI GUIDANCE</span><span>·</span><span>SKILL TRACKING</span><span>·</span>
+      <span>PYTHON</span><span>·</span><span>SQL</span><span>·</span>
+      <span>MACHINE LEARNING</span><span>·</span><span>DEEP LEARNING</span><span>·</span>
+      <span>STATISTICS</span><span>·</span><span>DATA SCIENCE</span><span>·</span>
+      <span>PORTFOLIO PROJECTS</span><span>·</span><span>MENTOR REVIEWS</span><span>·</span>
+      <span>AI GUIDANCE</span><span>·</span><span>SKILL TRACKING</span><span>·</span>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="section-label reveal">Features</div>
+    <h2 class="section-title reveal">Everything you need to<br>level up your career</h2>
+    <p class="section-desc reveal">CareerTrace combines AI guidance with structured learning paths to take you from where you are to where you want to be.</p>
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon">🤖</div>
+        <h3>AI Career Guide</h3>
+        <p>Chat with an intelligent assistant that understands your goals, skills, and pace — and gives actionable, personalized advice in real time.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🗺️</div>
+        <h3>Dynamic Roadmaps</h3>
+        <p>Visual learning paths that adapt as you grow. Prerequisites, milestones, and stretch goals — all beautifully mapped and interactive.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">📊</div>
+        <h3>Skill Tracking</h3>
+        <p>Evidence-based skill progression. Link repos, certs, and projects to track real growth — not just self-assessment.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🛠️</div>
+        <h3>Project Portfolio</h3>
+        <p>Build real-world projects with rubric-based evaluation. Prove your skills with tangible, portfolio-ready deliverables.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🎓</div>
+        <h3>Mentor Reviews</h3>
+        <p>Get expert feedback and sign-offs on your progress. Mentors review your work and validate your skills with stamps.</p>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feature-icon">🌐</div>
+        <h3>Community</h3>
+        <p>Join learning groups, collaborate with peers on your track, and keep each other accountable on the journey.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" id="how-it-works">
+    <div class="section-label reveal">How it works</div>
+    <h2 class="section-title reveal">Three steps to your<br>dream career</h2>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">1</div>
+        <h3>Set Your Goal</h3>
+        <p>Pick your target role, tell us your available hours and budget. We'll understand exactly where you are.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">2</div>
+        <h3>Get Your Roadmap</h3>
+        <p>Our AI builds a personalized learning path with prerequisites, resources, and capstone projects tailored for you.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">3</div>
+        <h3>Track & Level Up</h3>
+        <p>Check off milestones, build projects, earn mentor stamps, and watch your skill bars fill up toward your role.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats" id="stats">
+    <div class="stats-grid">
+      <div class="stat-item reveal">
+        <h3 data-count="500">0</h3>
+        <p>Careers traced</p>
+      </div>
+      <div class="stat-item reveal">
+        <h3 data-count="12">0</h3>
+        <p>Target roles</p>
+      </div>
+      <div class="stat-item reveal">
+        <h3 data-count="94">0</h3>
+        <p>Completion rate %</p>
+      </div>
+      <div class="stat-item reveal">
+        <h3>4.9★</h3>
+        <p>User rating</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonial -->
+  <section class="testimonial">
+    <blockquote class="reveal">
+      "CareerTrace turned my scattered learning into a clear, structured path. The AI Guide alone saved me weeks of planning — I just focus on building now."
+    </blockquote>
+    <cite class="reveal">— <strong>Aarav Mehta</strong>, DTU · aspiring Data Scientist</cite>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-glow"></div>
+    <h2 class="reveal">Ready to trace your career?</h2>
+    <p class="reveal">Join hundreds of students building their future with AI-powered guidance.</p>
+    <div class="reveal">
+      <a href="/register" class="btn btn-primary btn-large">Create Free Account&ensp;→</a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-inner">
+      <p>&copy; 2026 CareerTrace. Built for learners, by learners.</p>
+      <div class="footer-links">
+        <a href="#features">Features</a>
+        <a href="#how-it-works">How it works</a>
+        <a href="/login">Login</a>
+        <a href="/register">Sign up</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+  /* ── Three.js Particle Network ── */
+  (function(){
+    const canvas = document.getElementById('hero-canvas');
+    if (!canvas || typeof THREE === 'undefined') return;
+    const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    camera.position.z = 55;
+
+    const N = 180;
+    const pos = new Float32Array(N * 3);
+    const vel = [];
+    for (let i = 0; i < N; i++) {
+      pos[i*3]   = (Math.random() - 0.5) * 110;
+      pos[i*3+1] = (Math.random() - 0.5) * 65;
+      pos[i*3+2] = (Math.random() - 0.5) * 45;
+      vel.push({ x: (Math.random()-0.5)*0.018, y: (Math.random()-0.5)*0.018, z: (Math.random()-0.5)*0.008 });
+    }
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const mat = new THREE.PointsMaterial({ color: 0x8fa35a, size: 1.8, transparent: true, opacity: 0.7, sizeAttenuation: true });
+    const pts = new THREE.Points(geom, mat);
+    scene.add(pts);
+
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x6b7d3a, transparent: true, opacity: 0.08 });
+    let linesMesh;
+
+    function updateLines(){
+      if (linesMesh) scene.remove(linesMesh);
+      const lp = [], p = geom.attributes.position.array;
+      for (let i=0;i<N;i++) for (let j=i+1;j<N;j++){
+        const dx=p[i*3]-p[j*3], dy=p[i*3+1]-p[j*3+1], dz=p[i*3+2]-p[j*3+2];
+        if (dx*dx+dy*dy+dz*dz < 170) { lp.push(p[i*3],p[i*3+1],p[i*3+2],p[j*3],p[j*3+1],p[j*3+2]); }
+      }
+      if (lp.length){
+        const lg = new THREE.BufferGeometry();
+        lg.setAttribute('position', new THREE.Float32BufferAttribute(lp,3));
+        linesMesh = new THREE.LineSegments(lg, lineMat);
+        scene.add(linesMesh);
+      }
+    }
+
+    let mx=0, my=0;
+    document.addEventListener('mousemove', e => {
+      mx = (e.clientX/window.innerWidth - 0.5)*2;
+      my = -(e.clientY/window.innerHeight - 0.5)*2;
+    });
+
+    function resize(){
+      const w=canvas.clientWidth, h=canvas.clientHeight;
+      renderer.setSize(w,h,false);
+      camera.aspect=w/h;
+      camera.updateProjectionMatrix();
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    let f=0;
+    function animate(){
+      requestAnimationFrame(animate); f++;
+      const p=geom.attributes.position.array;
+      for(let i=0;i<N;i++){
+        p[i*3]+=vel[i].x; p[i*3+1]+=vel[i].y; p[i*3+2]+=vel[i].z;
+        if(Math.abs(p[i*3])>55)vel[i].x*=-1;
+        if(Math.abs(p[i*3+1])>32)vel[i].y*=-1;
+        if(Math.abs(p[i*3+2])>22)vel[i].z*=-1;
+      }
+      geom.attributes.position.needsUpdate=true;
+      if(f%4===0) updateLines();
+      camera.position.x+=(mx*6-camera.position.x)*0.015;
+      camera.position.y+=(my*4-camera.position.y)*0.015;
+      camera.lookAt(scene.position);
+      pts.rotation.y+=0.0002;
+      renderer.render(scene,camera);
+    }
+    animate();
+  })();
+
+  /* ── GSAP Scroll Animations ── */
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Staggered reveals
+  document.querySelectorAll('.features-grid, .steps, .stats-grid').forEach(container => {
+    const items = container.querySelectorAll('.reveal');
+    gsap.fromTo(items,
+      { opacity: 0, y: 50 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out', stagger: 0.12,
+        scrollTrigger: { trigger: container, start: 'top 82%', once: true } }
+    );
+  });
+
+  // Individual reveals
+  document.querySelectorAll('.reveal').forEach(el => {
+    if (el.closest('.features-grid, .steps, .stats-grid')) return; // skip grouped ones
+    gsap.fromTo(el,
+      { opacity: 0, y: 40 },
+      { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out',
+        scrollTrigger: { trigger: el, start: 'top 85%', once: true } }
+    );
+  });
+
+  // Counter animation for stats
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const target = parseInt(el.dataset.count);
+    ScrollTrigger.create({
+      trigger: el, start: 'top 85%', once: true,
+      onEnter: () => {
+        gsap.to({ v: 0 }, {
+          v: target, duration: 2, ease: 'power2.out',
+          onUpdate: function(){ el.textContent = Math.round(this.targets()[0].v) + (target > 90 ? '%' : '+'); }
+        });
+      }
+    });
+  });
+
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 60);
+  });
+
+  // Redirect if already logged in
+  if (localStorage.getItem('ct_token')) {
+    // show a subtle "Go to Dashboard" option
+    const act = document.querySelector('.nav-actions');
+    if (act) {
+      act.innerHTML = '<a href="/dashboard" class="btn btn-primary">Go to Dashboard&ensp;→</a>';
+    }
+  }
+  </script>
+</body>
+</html>

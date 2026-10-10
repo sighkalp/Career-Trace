@@ -1,0 +1,544 @@
+{
+  "p": {
+    "name": "Aarav Mehta",
+    "college": "DTU, Year 3",
+    "role": "Data Scientist",
+    "hours": 8,
+    "budget": 5000,
+    "weeks": 20,
+    "github": "aarav-m"
+  },
+  "skills": [
+    {
+      "id": "ycqjjz",
+      "name": "Python",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "ncs9hy",
+      "name": "SQL",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "q7ipox",
+      "name": "Stats",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "l0i2fu",
+      "name": "ML",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "gfp64r",
+      "name": "DL",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "ky0xp9",
+      "name": "Projects",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    },
+    {
+      "id": "gqxnqc",
+      "name": "Civil",
+      "cat": "Core",
+      "lvl": 0,
+      "tgt": 5,
+      "ev": [],
+      "rep": []
+    }
+  ],
+  "projects": [
+    {
+      "id": "p1",
+      "t": "Price-anomaly detector",
+      "tags": ["Python", "scraping"],
+      "st": "Building",
+      "rub": [
+        { "c": "Runs end to end", "p": 1 },
+        { "c": "Tests added", "p": 1 },
+        { "c": "Benchmarked", "p": 0 },
+        { "c": "README written", "p": 0 }
+      ],
+      "sk": ["Projects", "ML"],
+      "node": "cap",
+      "ver": null,
+      "req": false
+    }
+  ],
+  "nodes": [
+    {
+      "id": "py",
+      "t": "Python & data basics",
+      "ph": "Prerequisite",
+      "h": 30,
+      "paid": 0,
+      "req": [],
+      "sk": ["Python"],
+      "pr": 5,
+      "it": "Install Python & Jupyter|Pandas basics course|Clean a messy CSV|Plot with matplotlib",
+      "notes": "",
+      "items": [
+        {
+          "id": "n6ux1k",
+          "text": "variables, loops, conditionals",
+          "el": "variables, loops, conditionals",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "wexhdl",
+          "text": "functions & modules",
+          "el": "functions & modules",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "jgblx8",
+          "text": "list/dict comprehensions",
+          "el": "list/dict comprehensions",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "cpo1jb",
+          "text": "file & CSV I/O",
+          "el": "file & CSV I/O",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "0xnfnj",
+          "text": "classes & OOP",
+          "el": "classes & OOP",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "pjbj01",
+          "text": "virtual environments & pip",
+          "el": "virtual environments & pip",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "al4m2m",
+          "text": "pandas DataFrames",
+          "el": "pandas DataFrames",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "lahob0",
+          "text": "groupby & merge",
+          "el": "groupby & merge",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "nbx53a",
+          "text": "matplotlib/seaborn plots",
+          "el": "matplotlib/seaborn plots",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "m3e8b8",
+          "text": "pytest testing",
+          "el": "pytest testing",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "sql",
+      "t": "SQL for analytics",
+      "ph": "Prerequisite",
+      "h": 20,
+      "paid": 0,
+      "req": ["py"],
+      "sk": ["SQL"],
+      "pr": 5,
+      "it": "SELECT & JOINs tutorial|Window functions|Solve 20 practice queries|Query a real dataset",
+      "notes": "",
+      "items": [
+        {
+          "id": "dh6p3o",
+          "text": "SELECT, WHERE, ORDER BY",
+          "el": "SELECT, WHERE, ORDER BY",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "6otgca",
+          "text": "JOINs",
+          "el": "JOINs",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "9u76co",
+          "text": "GROUP BY & aggregates",
+          "el": "GROUP BY & aggregates",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "xke1zq",
+          "text": "subqueries & CTEs",
+          "el": "subqueries & CTEs",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "r0a2a9",
+          "text": "window functions",
+          "el": "window functions",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "1popsw",
+          "text": "indexes & query plans",
+          "el": "indexes & query plans",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "st",
+      "t": "Statistics",
+      "ph": "Prerequisite",
+      "h": 40,
+      "paid": 0,
+      "req": ["py"],
+      "sk": ["Stats"],
+      "pr": 4,
+      "it": "Probability basics|Distributions|Hypothesis testing|A/B test write-up",
+      "notes": "",
+      "items": [
+        {
+          "id": "wxhzkv",
+          "text": "descriptive statistics",
+          "el": "descriptive statistics",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "1jqkj1",
+          "text": "probability distributions",
+          "el": "probability distributions",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "mw775w",
+          "text": "sampling & CLT",
+          "el": "sampling & CLT",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "20r3fv",
+          "text": "hypothesis tests",
+          "el": "hypothesis tests",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "8pnh4v",
+          "text": "confidence intervals",
+          "el": "confidence intervals",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "pd48w0",
+          "text": "A/B test design",
+          "el": "A/B test design",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "ml",
+      "t": "Machine learning",
+      "ph": "SteppingStone",
+      "h": 60,
+      "paid": 4500,
+      "freeH": 75,
+      "req": ["sql", "st"],
+      "sk": ["ML"],
+      "pr": 4,
+      "it": "Linear & logistic regression|Trees & ensembles|Cross-validation|Model on a real dataset|Error analysis report",
+      "notes": "",
+      "items": [
+        {
+          "id": "r5k7uz",
+          "text": "train/test split",
+          "el": "train/test split",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "r1f2f9",
+          "text": "linear & logistic regression",
+          "el": "linear & logistic regression",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "u9qlic",
+          "text": "decision trees & ensembles",
+          "el": "decision trees & ensembles",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "udvdy9",
+          "text": "cross-validation",
+          "el": "cross-validation",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "39nndw",
+          "text": "feature engineering",
+          "el": "feature engineering",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "aay21y",
+          "text": "evaluation metrics",
+          "el": "evaluation metrics",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "8v5au9",
+          "text": "error analysis",
+          "el": "error analysis",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "dl",
+      "t": "Deep learning",
+      "ph": "Specialization",
+      "h": 50,
+      "paid": 3500,
+      "freeH": 55,
+      "req": ["ml"],
+      "sk": ["DL"],
+      "pr": 2,
+      "it": "Neural net from scratch|CNN basics|Fine-tune a small model",
+      "notes": "",
+      "items": [
+        {
+          "id": "bbvmu1",
+          "text": "neural net from scratch",
+          "el": "neural net from scratch",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "wba1o4",
+          "text": "PyTorch tensors & autograd",
+          "el": "PyTorch tensors & autograd",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "ppygam",
+          "text": "CNN basics",
+          "el": "CNN basics",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "fc9mrr",
+          "text": "training loops",
+          "el": "training loops",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "q0e8km",
+          "text": "fine-tuning a pretrained model",
+          "el": "fine-tuning a pretrained model",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "cap",
+      "t": "Capstone",
+      "ph": "TargetRole",
+      "h": 50,
+      "paid": 0,
+      "req": ["ml"],
+      "sk": ["Projects"],
+      "pr": 3,
+      "it": "Pick a data source|Week-1 vertical slice|Benchmark & evaluate|Write the README",
+      "notes": "",
+      "items": [
+        {
+          "id": "ksotbs",
+          "text": "README with setup steps",
+          "el": "README with setup steps",
+          "done": 1,
+          "skip": 0
+        },
+        {
+          "id": "zlgtmh",
+          "text": "tests",
+          "el": "tests",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "of44qn",
+          "text": "CI workflow",
+          "el": "CI workflow",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "ykzr27",
+          "text": "benchmark or metric",
+          "el": "benchmark or metric",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "p6xfzc",
+          "text": "demo or write-up",
+          "el": "demo or write-up",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    },
+    {
+      "id": "xjmiz48",
+      "t": "Civil engineering foundations",
+      "ph": "Specialization",
+      "h": 25,
+      "paid": 0,
+      "req": [],
+      "sk": ["Civil"],
+      "pr": 2,
+      "custom": 1,
+      "notes": "",
+      "items": [
+        {
+          "id": "1bca8z",
+          "text": "statics & equilibrium",
+          "el": "statics & equilibrium",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "cxq2hw",
+          "text": "mechanics of materials",
+          "el": "mechanics of materials",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "2n4ifx",
+          "text": "structural analysis",
+          "el": "structural analysis",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "brswcf",
+          "text": "CAD drafting",
+          "el": "CAD drafting",
+          "done": 0,
+          "skip": 0
+        },
+        {
+          "id": "5gd2u8",
+          "text": "surveying basics",
+          "el": "surveying basics",
+          "done": 0,
+          "skip": 0
+        }
+      ]
+    }
+  ],
+  "act": [
+    "Joined group SQL Sprint",
+    "Roadmap adapted: added Civil engineering foundations",
+    "Toggled: statics & equilibrium",
+    "Toggled: statics & equilibrium"
+  ],
+  "route": {},
+  "rev": null,
+  "known": {
+    "Python": {
+      "variables, loops, conditionals": "repo: stock-scraper/scraper.py",
+      "functions & modules": "repo: stock-scraper/scraper.py",
+      "file & CSV I/O": "repo: stock-scraper/scraper.py",
+      "pandas DataFrames": "repo: stock-scraper/scraper.py",
+      "list/dict comprehensions": "repo: stock-scraper/scraper.py",
+      "classes & OOP": "self-declared"
+    },
+    "SQL": {
+      "SELECT, WHERE, ORDER BY": "self-declared",
+      "JOINs": "self-declared"
+    },
+    "Stats": {
+      "descriptive statistics": "cert: NPTEL Stats",
+      "probability distributions": "cert: NPTEL Stats",
+      "sampling & CLT": "cert: NPTEL Stats"
+    },
+    "ML": { "train/test split": "self-declared" },
+    "Projects": { "README with setup steps": "repo: stock-scraper/README.md" },
+    "Civil": {}
+  },
+  "extra": {
+    "Civil": [
+      "statics & equilibrium",
+      "mechanics of materials",
+      "structural analysis",
+      "CAD drafting",
+      "surveying basics"
+    ]
+  },
+  "ts": 1791628679977
+}
