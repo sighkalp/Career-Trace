@@ -1056,11 +1056,13 @@
           <div class="m" style="margin-top: 10px">Profile completeness</div>
           <div class="bar"><i id="comp"></i></div>
           <div id="nudge" class="m" style="margin-top: 6px"></div>
-          <button style="margin-top: 10px" onclick="startOver()">
-            Start from scratch
-          </button>
-          <button onclick="reseed()">Load demo</button>
+          <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+            <button onclick="openEditProfile()">✏️ Edit Profile</button>
+            <button onclick="startOver()">Start from scratch</button>
+            <button onclick="reseed()">Load demo</button>
+          </div>
         </section>
+
         <section class="s4 tilt" id="progress">
           <h2><small>02</small>Progress</h2>
           <div style="display: flex; gap: 14px; align-items: center">
@@ -1412,17 +1414,11 @@
           rev: null,
         };
       }
-      try {
-        const x = localStorage.getItem("ct2");
-        S = x ? JSON.parse(x) : null;
-      } catch (e) {
-        S = null;
-      }
+      // State is always loaded from server — never from localStorage cache.
+      // S starts as null; seed() provides a working skeleton while we wait for the server response.
+      S = null;
       function save() {
         if (LOADED) S.ts = Date.now();
-        try {
-          localStorage.setItem("ct2", JSON.stringify(S));
-        } catch (e) {}
         pushState();
       }
       /* SELECTORS (all derived, none stored) */
@@ -1535,7 +1531,7 @@
         replan();
         save();
         const p = S.p;
-        $("who").textContent = `${p.name} · target: ${p.role || "not set"}`;
+        $("who").textContent = `${p.name || currentUser && (currentUser.fullname || currentUser.username) || '...'} · target: ${p.role || "not set"}`;
         $("pct").textContent = overall() + "% overall";
         $("prof").innerHTML = [
           ["College", p.college],
@@ -4437,17 +4433,17 @@
       let currentUser = null;
       try { currentUser = JSON.parse(localStorage.getItem('ct_user')); } catch(e) {}
       
-      if (!S || !S.nodes || !S.known) {
+      if (!S) {
         seed(currentUser);
-        S.ts = Date.now();
-      } else if (currentUser && S.p && S.p.name === "Aarav Mehta" && currentUser.username !== "Aarav Mehta") {
-        // Clear cached demo data if they logged into a real account
-        seed(currentUser);
-        S.ts = Date.now();
       } else {
         S.extra = S.extra || {};
         relayout();
         syncItems();
+      }
+      // Show name from ct_user immediately while waiting for server
+      if (currentUser) {
+        const topbarName = currentUser.fullname || currentUser.username || 'You';
+        try { $("who").textContent = `${topbarName} · target: ${S && S.p && S.p.role ? S.p.role : 'not set'}`; } catch(e) {}
       }
 
       /* SERVER LAYER: state persistence, shared mentor reviews, realtime group chat */
@@ -4546,17 +4542,43 @@
           .catch(() => {});
         if (!isMentor())
           api("/api/state")
-            .then((j) => {
-              if (j.state && j.state.nodes && (j.state.ts || 0) > (S.ts || 0)) {
+            .then(async (j) => {
+              if (j.state && j.state.nodes && j.state.nodes.length > 0 && j.state._generated === true) {
+                // Verified AI-generated state — always trust it
                 S = j.state;
                 S.extra = S.extra || {};
                 S.known = S.known || {};
                 relayout();
                 syncItems();
                 render();
+                LOADED = true;
+                pushState();
+              } else {
+                // No state OR dummy seed data — generate personalized roadmap via LLM
+                showOnboardingLoader();
+                try {
+                  const ob = await api("/api/onboard", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+                  hideOnboardingLoader();
+                  if (ob.state && ob.state.nodes) {
+                    S = ob.state;
+                    S.extra = S.extra || {};
+                    S.known = S.known || {};
+                    relayout();
+                    syncItems();
+                    render();
+                    window.showToast && window.showToast("🎉 Your personalized roadmap is ready!", "success");
+                  } else {
+                    window.showToast && window.showToast("AI generation failed — try refreshing.", "error");
+                    render();
+                  }
+                } catch(e) {
+                  hideOnboardingLoader();
+                  window.showToast && window.showToast("Could not reach AI — try refreshing.", "error");
+                  render();
+                }
+                LOADED = true;
+                pushState();
               }
-              LOADED = true;
-              pushState();
             })
             .catch(() => {
               LOADED = true;
@@ -5029,6 +5051,136 @@
         setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
       };
       
+      function showOnboardingLoader() {
+        const el = document.createElement('div');
+        el.id = 'onboarding-loader';
+        el.style.cssText = 'position:fixed;inset:0;background:#06070a;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:Inter,sans-serif';
+        const name = (currentUser && (currentUser.fullname || currentUser.username)) || 'you';
+        el.innerHTML = `
+          <div style="text-align:center">
+            <div style="font-size:36px;margin-bottom:8px">🚀</div>
+            <h2 style="color:#f0f0f5;font-size:22px;font-weight:800;margin:0 0 8px;letter-spacing:-0.03em">Building your roadmap, ${name.split(' ')[0]}…</h2>
+            <p style="color:#5a5e68;font-size:14px;margin:0">Our AI is creating a personalized learning plan just for you</p>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;width:320px">
+            <div class="loader-step" id="ls1" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.06);opacity:0.4;transition:all 0.5s">
+              <span style="font-size:18px">🎯</span><span style="color:#c0c4cc;font-size:13px">Analyzing your target role &amp; profile</span>
+            </div>
+            <div class="loader-step" id="ls2" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.06);opacity:0.4;transition:all 0.5s">
+              <span style="font-size:18px">🧠</span><span style="color:#c0c4cc;font-size:13px">Mapping skills &amp; learning milestones</span>
+            </div>
+            <div class="loader-step" id="ls3" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.06);opacity:0.4;transition:all 0.5s">
+              <span style="font-size:18px">📦</span><span style="color:#c0c4cc;font-size:13px">Selecting projects &amp; deadlines</span>
+            </div>
+            <div class="loader-step" id="ls4" style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.04);border-radius:10px;border:1px solid rgba(255,255,255,0.06);opacity:0.4;transition:all 0.5s">
+              <span style="font-size:18px">✅</span><span style="color:#c0c4cc;font-size:13px">Finalizing your personalized plan</span>
+            </div>
+          </div>
+          <div style="width:280px;height:4px;background:rgba(255,255,255,0.06);border-radius:99px;overflow:hidden">
+            <div id="loader-bar" style="height:100%;background:linear-gradient(90deg,#5c6e30,#a4c244);border-radius:99px;width:0%;transition:width 0.8s ease"></div>
+          </div>`;
+        document.body.appendChild(el);
+        // Animate steps
+        const steps = [1,2,3,4];
+        steps.forEach((n, i) => {
+          setTimeout(() => {
+            const s = document.getElementById('ls' + n);
+            if (s) s.style.opacity = '1';
+            const bar = document.getElementById('loader-bar');
+            if (bar) bar.style.width = ((i+1)*22) + '%';
+          }, i * 1800);
+        });
+      }
+      function hideOnboardingLoader() {
+        const el = document.getElementById('onboarding-loader');
+        if (el) {
+          const bar = document.getElementById('loader-bar');
+          if (bar) bar.style.width = '100%';
+          setTimeout(() => el.remove(), 600);
+        }
+      }
+
+      async function openEditProfile() {
+        // Fetch current profile from server (source of truth)
+        let prof = {};
+        try { prof = await api('/api/profile'); } catch(e) {}
+
+        const overlay = document.createElement('div');
+        overlay.id = 'profileModal';
+        overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9000;display:flex;align-items:center;justify-content:center;padding:20px';
+        overlay.innerHTML = `
+          <div style="background:#1a1d24;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto">
+            <h3 style="margin:0 0 20px;font-size:18px;font-weight:700;color:#f0f0f5">Edit Profile</h3>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">Full Name</label>
+                <input id="ep_fullname" value="${esc(prof.fullname||'')}" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">College</label>
+                <input id="ep_college" value="${esc(prof.college||'')}" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+              <div style="grid-column:1/-1">
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">Target Role</label>
+                <input id="ep_targetRole" value="${esc(prof.targetRole||S.p.role||'')}" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none" placeholder="e.g. Data Scientist, SWE, ML Engineer">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">GitHub Username</label>
+                <input id="ep_github" value="${esc(prof.github||S.p.github||'')}" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">Weekly Hours</label>
+                <input id="ep_hours" type="number" value="${prof.hours||S.p.hours||''}" min="1" max="80" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">Budget (INR)</label>
+                <input id="ep_budget" type="number" value="${prof.budget||S.p.budget||''}" min="0" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+              <div>
+                <label style="display:block;font-size:12px;color:#8a8f9e;margin-bottom:4px">Deadline (weeks)</label>
+                <input id="ep_weeks" type="number" value="${prof.weeks||S.p.weeks||''}" min="1" style="width:100%;background:#0d0f14;border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:8px 12px;color:#f0f0f5;font-size:14px;outline:none">
+              </div>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:20px">
+              <button id="ep_save" style="flex:1;background:linear-gradient(135deg,#5c6e30,#7a9140);color:#fff;border:none;border-radius:10px;padding:10px;font-size:14px;font-weight:700;cursor:pointer">Save Changes</button>
+              <button onclick="document.getElementById('profileModal').remove()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);color:#f0f0f5;border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer">Cancel</button>
+            </div>
+            <div id="ep_msg" style="margin-top:10px;font-size:13px;text-align:center"></div>
+          </div>`;
+        document.body.appendChild(overlay);
+
+        document.getElementById('ep_save').onclick = async () => {
+          const upd = {
+            fullname: document.getElementById('ep_fullname').value.trim(),
+            college: document.getElementById('ep_college').value.trim(),
+            targetRole: document.getElementById('ep_targetRole').value.trim(),
+            github: document.getElementById('ep_github').value.trim(),
+            hours: parseInt(document.getElementById('ep_hours').value)||0,
+            budget: parseInt(document.getElementById('ep_budget').value)||0,
+            weeks: parseInt(document.getElementById('ep_weeks').value)||0,
+          };
+          document.getElementById('ep_msg').textContent = 'Saving…';
+          try {
+            await fetch('/api/profile', { method:'PUT', headers:{'Content-Type':'application/json'}, body: JSON.stringify(upd) });
+            // Also update live S.p and localStorage ct_user
+            S.p.role = upd.targetRole;
+            S.p.github = upd.github;
+            S.p.hours = upd.hours;
+            S.p.budget = upd.budget;
+            S.p.weeks = upd.weeks;
+            const stored = JSON.parse(localStorage.getItem('ct_user')||'{}');
+            stored.fullname = upd.fullname;
+            stored.college = upd.college;
+            localStorage.setItem('ct_user', JSON.stringify(stored));
+            render();
+            document.getElementById('profileModal').remove();
+            window.showToast && window.showToast('Profile updated!', 'success');
+          } catch(e) {
+            document.getElementById('ep_msg').textContent = 'Failed to save. Try again.';
+          }
+        };
+      }
+
       function logout() {
         localStorage.removeItem('ct_token');
         localStorage.removeItem('ct_user');

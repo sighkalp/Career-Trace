@@ -9,41 +9,26 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body { height: 100%; }
+    html { height: 100%; }
     body {
       font-family: 'Inter', -apple-system, sans-serif;
       background: #06070a;
       color: #f0f0f5;
-      display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
+      min-height: 100%;
+      display: flex; align-items: flex-start; justify-content: center;
+      padding: 24px 20px;
       -webkit-font-smoothing: antialiased;
     }
 
     /* Animated background */
-    .bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+    .bg { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
     .bg .orb {
       position: absolute; border-radius: 50%; filter: blur(80px);
       animation: orbFloat 12s ease-in-out infinite alternate;
     }
-    .bg .orb-1 {
-      width: 500px; height: 500px;
-      background: rgba(107,125,58,0.12);
-      top: -10%; right: -10%;
-      animation-duration: 15s;
-    }
-    .bg .orb-2 {
-      width: 400px; height: 400px;
-      background: rgba(143,163,90,0.08);
-      bottom: -10%; left: -8%;
-      animation-duration: 11s;
-      animation-direction: alternate-reverse;
-    }
-    .bg .orb-3 {
-      width: 280px; height: 280px;
-      background: rgba(75,90,39,0.1);
-      top: 50%; left: 50%;
-      animation-duration: 17s;
-    }
+    .bg .orb-1 { width: 500px; height: 500px; background: rgba(107,125,58,0.12); top: -10%; right: -10%; animation-duration: 15s; }
+    .bg .orb-2 { width: 400px; height: 400px; background: rgba(143,163,90,0.08); bottom: -10%; left: -8%; animation-duration: 11s; animation-direction: alternate-reverse; }
+    .bg .orb-3 { width: 280px; height: 280px; background: rgba(75,90,39,0.1); top: 50%; left: 50%; animation-duration: 17s; }
     @keyframes orbFloat {
       0% { transform: translate(0, 0) scale(1); }
       50% { transform: translate(-30px, 40px) scale(1.08); }
@@ -51,23 +36,21 @@
     }
     .bg-grid {
       position: absolute; inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-image: linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
       background-size: 60px 60px;
       mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black, transparent);
       -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 50%, black, transparent);
     }
 
     /* Card */
-    .container { position: relative; z-index: 1; width: 100%; max-width: 440px; padding: 20px; }
+    .container { position: relative; z-index: 1; width: 100%; max-width: 520px; }
     .card {
       background: rgba(255,255,255,0.035);
       backdrop-filter: blur(40px) saturate(1.3);
       -webkit-backdrop-filter: blur(40px) saturate(1.3);
-      border: 1px solid rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.07);
       border-radius: 24px;
-      padding: 40px 40px;
+      padding: 40px;
       box-shadow: 0 30px 60px -20px rgba(0,0,0,0.5);
       animation: cardIn 0.6s ease-out;
     }
@@ -77,114 +60,104 @@
     }
 
     /* Logo */
-    .logo {
-      display: flex; align-items: center; gap: 10px; margin-bottom: 28px;
-      text-decoration: none; color: #f0f0f5; font-size: 18px; font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-    .logo-icon {
-      width: 34px; height: 34px; border-radius: 10px;
-      background: linear-gradient(135deg, #6b7d3a, #a4c244);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px; font-weight: 800; color: #fff;
-      box-shadow: 0 2px 12px rgba(107,125,58,0.3);
-    }
+    .logo { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; text-decoration: none; color: #f0f0f5; font-size: 18px; font-weight: 800; letter-spacing: -0.03em; }
+    .logo-icon { width: 34px; height: 34px; border-radius: 10px; background: linear-gradient(135deg, #6b7d3a, #a4c244); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; box-shadow: 0 2px 12px rgba(107,125,58,0.3); }
 
-    .card h1 {
-      font-size: 28px; font-weight: 800; letter-spacing: -0.03em;
-      margin-bottom: 6px;
-    }
-    .card .subtitle {
-      font-size: 14px; color: #5a5e68; margin-bottom: 28px;
-    }
+    .card h1 { font-size: 26px; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 4px; }
+    .card .subtitle { font-size: 13px; color: #5a5e68; margin-bottom: 28px; }
+
+    /* Step indicator */
+    .steps { display: flex; gap: 6px; margin-bottom: 24px; }
+    .step { flex: 1; height: 3px; background: rgba(255,255,255,0.08); border-radius: 99px; transition: background 0.4s; }
+    .step.active { background: #7a9140; }
+    .step.done { background: #a4c244; }
+
+    /* Step panels */
+    .step-panel { display: none; animation: fadeIn 0.3s ease; }
+    .step-panel.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: none; } }
+
+    .step-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #6b7d3a; margin-bottom: 14px; }
 
     /* Form */
     .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-    .field { margin-bottom: 18px; }
-    .field label {
-      display: block; font-size: 13px; font-weight: 600; color: #8a8f98;
-      margin-bottom: 6px; letter-spacing: 0.01em;
-    }
-    .field input {
-      width: 100%; padding: 12px 16px;
+    .field { margin-bottom: 16px; }
+    .field label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #8a8f98; margin-bottom: 6px; letter-spacing: 0.01em; }
+    .field label .req { color: #e74c3c; font-size: 10px; }
+    .field label .hint { color: #4a4e58; font-size: 11px; font-weight: 400; margin-left: auto; }
+
+    .field input, .field select {
+      width: 100%; padding: 11px 14px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
-      border-radius: 12px; color: #f0f0f5;
-      font-size: 15px; font-family: inherit;
+      border-radius: 10px; color: #f0f0f5;
+      font-size: 14px; font-family: inherit;
       outline: none; transition: all 0.25s;
+      appearance: none; -webkit-appearance: none;
     }
     .field input::placeholder { color: #3a3d46; }
-    .field input:focus {
-      border-color: rgba(107,125,58,0.5);
+    .field input:focus, .field select:focus {
+      border-color: rgba(107,125,58,0.6);
       background: rgba(255,255,255,0.06);
       box-shadow: 0 0 0 3px rgba(107,125,58,0.12);
     }
+    .field input.invalid, .field select.invalid {
+      border-color: rgba(220,38,38,0.5);
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.08);
+    }
+    .field input.valid, .field select.valid {
+      border-color: rgba(107,125,58,0.4);
+    }
+    .field-err { font-size: 11px; color: #f87171; margin-top: 4px; display: none; }
+    .field-err.show { display: block; }
 
-    .error {
-      background: rgba(220,38,38,0.08);
-      border: 1px solid rgba(220,38,38,0.2);
-      color: #f87171; border-radius: 10px;
-      padding: 10px 14px; font-size: 13px; font-weight: 500;
-      margin-bottom: 16px;
-      display: none;
-    }
-    .error.show { display: block; }
+    /* Select wrapper for custom arrow */
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: '▾'; position: absolute; right: 12px; top: 50%; transform: translateY(-50%); color: #5a5e68; pointer-events: none; font-size: 13px; }
+    .select-wrap select { padding-right: 32px; cursor: pointer; }
+    .select-wrap select option { background: #1a1d24; color: #f0f0f5; }
 
-    .success {
-      background: rgba(107,125,58,0.1);
-      border: 1px solid rgba(107,125,58,0.25);
-      color: #a4c244; border-radius: 10px;
-      padding: 10px 14px; font-size: 13px; font-weight: 500;
-      margin-bottom: 16px;
-      display: none;
+    /* Role cards */
+    .role-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .role-card {
+      padding: 12px 14px; border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;
+      background: rgba(255,255,255,0.03); cursor: pointer; transition: all 0.2s;
+      display: flex; align-items: center; gap: 10px;
     }
-    .success.show { display: block; }
+    .role-card:hover { border-color: rgba(107,125,58,0.4); background: rgba(107,125,58,0.06); }
+    .role-card.selected { border-color: #7a9140; background: rgba(107,125,58,0.12); }
+    .role-card .icon { font-size: 20px; width: 32px; text-align: center; }
+    .role-card .info .title { font-size: 13px; font-weight: 600; color: #e0e4ee; }
+    .role-card .info .sub { font-size: 11px; color: #5a5e68; margin-top: 2px; }
+    input[name="targetRole"] { display: none; }
 
-    .btn-submit {
-      width: 100%; padding: 14px;
-      background: linear-gradient(135deg, #5c6e30, #7a9140, #6b7d3a);
-      color: #fff; border: none; border-radius: 12px;
-      font-size: 15px; font-weight: 700; font-family: inherit;
-      cursor: pointer;
-      box-shadow: 0 2px 20px rgba(107,125,58,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
-      transition: all 0.25s;
-    }
-    .btn-submit:hover {
-      box-shadow: 0 4px 28px rgba(107,125,58,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
-      transform: translateY(-1px);
-    }
-    .btn-submit:active { transform: translateY(1px); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .nav-btns { display: flex; gap: 10px; margin-top: 20px; }
+    .btn-back { flex: 0 0 auto; padding: 12px 20px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #a0a4b0; border-radius: 10px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; transition: all 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.1); color: #f0f0f5; }
+    .btn-next { flex: 1; padding: 12px; background: linear-gradient(135deg, #5c6e30, #7a9140); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: 700; font-family: inherit; cursor: pointer; transition: all 0.2s; box-shadow: 0 2px 16px rgba(107,125,58,0.2); }
+    .btn-next:hover { transform: translateY(-1px); box-shadow: 0 4px 24px rgba(107,125,58,0.35); }
+    .btn-next:active { transform: translateY(1px); }
+    .btn-next:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
-    .terms {
-      font-size: 12px; color: #4a4e58; text-align: center;
-      margin-top: 16px; line-height: 1.5;
-    }
-    .terms a { color: #6b7d3a; text-decoration: none; }
-    .terms a:hover { text-decoration: underline; }
-
-    .switch {
-      margin-top: 22px; text-align: center;
-      font-size: 14px; color: #5a5e68;
-    }
-    .switch a {
-      color: #8fa35a; text-decoration: none; font-weight: 600;
-      transition: color 0.2s;
-    }
+    .switch { margin-top: 20px; text-align: center; font-size: 13px; color: #5a5e68; }
+    .switch a { color: #8fa35a; text-decoration: none; font-weight: 600; }
     .switch a:hover { color: #a4c244; }
 
-    .back-link {
-      position: fixed; top: 20px; left: 24px; z-index: 10;
-      color: #5a5e68; text-decoration: none; font-size: 14px; font-weight: 500;
-      display: flex; align-items: center; gap: 6px;
-      transition: color 0.2s;
-    }
+    .back-link { position: fixed; top: 20px; left: 24px; z-index: 10; color: #5a5e68; text-decoration: none; font-size: 14px; font-weight: 500; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
     .back-link:hover { color: #f0f0f5; }
 
     @media (max-width: 500px) {
-      .card { padding: 32px 24px; }
+      .card { padding: 28px 20px; }
       .row { grid-template-columns: 1fr; }
+      .role-grid { grid-template-columns: 1fr; }
     }
+
+    /* Toast */
+    #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; font-size: 14px; min-width: 250px; }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 4px solid #a4c244; }
+    .toast.error { border-left: 4px solid #e74c3c; }
   </style>
 </head>
 <body>
@@ -204,105 +177,136 @@
         CareerTrace
       </a>
       <h1>Create your account</h1>
-      <p class="subtitle">Start mapping your career in minutes</p>
+      <p class="subtitle">We'll build a personalized roadmap for you</p>
 
-      <form id="registerForm" autocomplete="off">
-        <div class="row">
-          <div class="field">
-            <label for="fullname">Full Name</label>
-            <input type="text" id="fullname" name="fullname" placeholder="Aarav Mehta" required autofocus>
+      <!-- Step progress dots -->
+      <div class="steps">
+        <div class="step active" id="step-dot-1"></div>
+        <div class="step" id="step-dot-2"></div>
+        <div class="step" id="step-dot-3"></div>
+      </div>
+
+      <form id="registerForm" autocomplete="off" novalidate>
+
+        <!-- STEP 1: Account -->
+        <div class="step-panel active" id="panel-1">
+          <div class="step-label">Step 1 of 3 · Account Details</div>
+          <div class="row">
+            <div class="field">
+              <label for="fullname">Full Name <span class="req">*</span></label>
+              <input type="text" id="fullname" name="fullname" placeholder="Your full name" autocomplete="name">
+              <div class="field-err" id="err-fullname">Please enter your full name</div>
+            </div>
+            <div class="field">
+              <label for="college">College / University</label>
+              <input type="text" id="college" name="college" placeholder="e.g. DTU, Year 3">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="email">Email <span class="req">*</span></label>
+              <input type="email" id="email" name="email" placeholder="you@example.com" autocomplete="email">
+              <div class="field-err" id="err-email">Enter a valid email address</div>
+            </div>
+            <div class="field">
+              <label for="username">Username <span class="req">*</span> <span class="hint">letters, numbers, _</span></label>
+              <input type="text" id="username" name="username" placeholder="choose_a_username" autocomplete="username" pattern="[a-zA-Z0-9_]{3,30}">
+              <div class="field-err" id="err-username">3–30 characters, letters/numbers/_ only</div>
+            </div>
           </div>
           <div class="field">
-            <label for="college">College</label>
-            <input type="text" id="college" name="college" placeholder="DTU, Year 3">
+            <label for="password">Password <span class="req">*</span> <span class="hint">min. 8 characters</span></label>
+            <input type="password" id="password" name="password" placeholder="Create a strong password" autocomplete="new-password" minlength="8">
+            <div class="field-err" id="err-password">Must be at least 8 characters</div>
+          </div>
+          <div class="nav-btns">
+            <button type="button" class="btn-next" id="next-1" onclick="goStep(2)">Continue →</button>
           </div>
         </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input type="email" id="email" name="email" placeholder="you@example.com" required>
+
+        <!-- STEP 2: Target Role -->
+        <div class="step-panel" id="panel-2">
+          <div class="step-label">Step 2 of 3 · Your Target Role</div>
+          <p style="font-size:13px;color:#5a5e68;margin-bottom:16px">This determines your personalized AI roadmap — pick the role you're aiming for.</p>
+          <input type="hidden" name="targetRole" id="targetRole" value="">
+          <div class="role-grid" id="role-grid">
+            <!-- populated by JS -->
+          </div>
+          <div class="field-err" id="err-role" style="margin-bottom:10px">Please select a target role</div>
+          <div class="nav-btns">
+            <button type="button" class="btn-back" onclick="goStep(1)">← Back</button>
+            <button type="button" class="btn-next" id="next-2" onclick="goStep(3)">Continue →</button>
+          </div>
         </div>
-        <div class="field">
-          <label for="username">Username</label>
-          <input type="text" id="username" name="username" placeholder="Choose a username" required>
+
+        <!-- STEP 3: Career Plan -->
+        <div class="step-panel" id="panel-3">
+          <div class="step-label">Step 3 of 3 · Your Learning Plan</div>
+          <p style="font-size:13px;color:#5a5e68;margin-bottom:16px">Help our AI calibrate your roadmap timeline and project recommendations.</p>
+          <div class="row">
+            <div class="field">
+              <label for="hours">Weekly Hours Available <span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="hours" name="hours">
+                  <option value="">Select hours…</option>
+                  <option value="4">~4 hrs/week (Casual)</option>
+                  <option value="8">~8 hrs/week (Part-time)</option>
+                  <option value="15">~15 hrs/week (Serious)</option>
+                  <option value="25">~25 hrs/week (Intensive)</option>
+                  <option value="40">40+ hrs/week (Full-time)</option>
+                </select>
+              </div>
+              <div class="field-err" id="err-hours">Please select your availability</div>
+            </div>
+            <div class="field">
+              <label for="weeks">Timeline <span class="req">*</span></label>
+              <div class="select-wrap">
+                <select id="weeks" name="weeks">
+                  <option value="">Select timeline…</option>
+                  <option value="8">8 weeks (2 months)</option>
+                  <option value="12">12 weeks (3 months)</option>
+                  <option value="20">20 weeks (5 months)</option>
+                  <option value="26">26 weeks (6 months)</option>
+                  <option value="52">52 weeks (1 year)</option>
+                </select>
+              </div>
+              <div class="field-err" id="err-weeks">Please select a timeline</div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="budget">Budget for Courses (INR)</label>
+              <div class="select-wrap">
+                <select id="budget" name="budget">
+                  <option value="0">₹0 (Free only)</option>
+                  <option value="2000">Up to ₹2,000</option>
+                  <option value="5000">Up to ₹5,000</option>
+                  <option value="10000">Up to ₹10,000</option>
+                  <option value="25000">Up to ₹25,000</option>
+                  <option value="50000">Up to ₹50,000</option>
+                </select>
+              </div>
+            </div>
+            <div class="field">
+              <label for="github">GitHub Username <span class="hint">optional</span></label>
+              <input type="text" id="github" name="github" placeholder="your-github" autocomplete="off" pattern="[a-zA-Z0-9\-]{1,39}">
+              <div class="field-err" id="err-github">Only letters, numbers, hyphens (max 39)</div>
+            </div>
+          </div>
+          <div id="form-error" style="background:rgba(220,38,38,0.08);border:1px solid rgba(220,38,38,0.2);color:#f87171;border-radius:10px;padding:10px 14px;font-size:13px;margin-bottom:12px;display:none"></div>
+          <div class="nav-btns">
+            <button type="button" class="btn-back" onclick="goStep(2)">← Back</button>
+            <button type="submit" class="btn-next" id="submitBtn">🚀 Create Account &amp; Generate Roadmap</button>
+          </div>
         </div>
-        <div class="field">
-          <label for="password">Password</label>
-          <input type="password" id="password" name="password" placeholder="Min. 8 characters" required minlength="8">
-        </div>
-        <div class="error" id="error"></div>
-        <div class="success" id="success"></div>
-        <button type="submit" class="btn-submit" id="submitBtn">Create Account</button>
       </form>
-
-      <p class="terms">By creating an account, you agree to our <a href="#">Terms</a> and <a href="#">Privacy Policy</a>.</p>
 
       <p class="switch">Already have an account? <a href="/login">Sign in</a></p>
     </div>
   </div>
 
-  <script>
-    const form = document.getElementById('registerForm');
-    const errorEl = document.getElementById('error');
-    const successEl = document.getElementById('success');
-    const submitBtn = document.getElementById('submitBtn');
-
-    // Redirect if already logged in
-    if (localStorage.getItem('ct_token')) {
-      location.replace('/dashboard');
-    }
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      errorEl.classList.remove('show');
-      successEl.classList.remove('show');
-
-      const fullname = document.getElementById('fullname').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value;
-      const college = document.getElementById('college').value.trim();
-
-      if (password.length < 8) {
-        errorEl.textContent = 'Password must be at least 8 characters.';
-        errorEl.classList.add('show');
-        return;
-      }
-
-      submitBtn.disabled = true;
-      submitBtn.textContent = 'Creating account…';
-
-      try {
-        const res = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fullname, email, username, password, college })
-        });
-        const data = await res.json();
-
-        if (res.ok && data.ok) {
-          window.showToast(data.message || 'Account created! Redirecting to login…', 'success');
-          form.reset();
-          setTimeout(() => location.replace('/login'), 1500);
-        } else {
-          window.showToast(data.error || 'Registration failed. Please try again.', 'error');
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Create Account';
-        }
-      } catch (err) {
-        window.showToast('Connection error. Please try again.', 'error');
-        submitBtn.disabled = false;
-        submitBtn.textContent = 'Create Account';
-      }
-    });
-  </script>
-  <style>
-    #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
-    .toast { background: #1a1a1a; border: 1px solid #333; color: #fff; padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.5); opacity: 0; transform: translateY(20px); transition: all 0.3s ease; font-size: 14px; min-width: 250px;}
-    .toast.show { opacity: 1; transform: translateY(0); }
-    .toast.success { border-left: 4px solid #a4c244; }
-    .toast.error { border-left: 4px solid #e74c3c; }
-  </style>
   <div id="toast-container"></div>
+
   <script>
     window.showToast = function(msg, type='success') {
       const container = document.getElementById('toast-container');
@@ -311,8 +315,153 @@
       toast.innerText = msg;
       container.appendChild(toast);
       setTimeout(() => toast.classList.add('show'), 10);
-      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+      setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3500);
     };
+
+    if (localStorage.getItem('ct_token')) location.replace('/dashboard');
+
+    // ── Role definitions ────────────────────────────────────────────────────
+    const ROLES = [
+      { value: 'Data Scientist',        icon: '📊', sub: 'ML, stats, Python' },
+      { value: 'Machine Learning Engineer', icon: '🤖', sub: 'MLOps, models, deployment' },
+      { value: 'Software Engineer',     icon: '💻', sub: 'DSA, systems, APIs' },
+      { value: 'Frontend Developer',    icon: '🎨', sub: 'React, CSS, UI/UX' },
+      { value: 'Backend Developer',     icon: '⚙️', sub: 'Node, databases, REST' },
+      { value: 'Full Stack Developer',  icon: '🔗', sub: 'End-to-end product dev' },
+      { value: 'DevOps / SRE',          icon: '☁️', sub: 'CI/CD, Docker, K8s' },
+      { value: 'AI / LLM Engineer',     icon: '🧠', sub: 'LLMs, RAG, fine-tuning' },
+      { value: 'Data Analyst',          icon: '📈', sub: 'SQL, dashboards, insights' },
+      { value: 'Product Manager',       icon: '🗺️', sub: 'Strategy, roadmaps, metrics' },
+    ];
+
+    const grid = document.getElementById('role-grid');
+    ROLES.forEach(r => {
+      const card = document.createElement('div');
+      card.className = 'role-card';
+      card.dataset.value = r.value;
+      card.innerHTML = `<div class="icon">${r.icon}</div><div class="info"><div class="title">${r.value}</div><div class="sub">${r.sub}</div></div>`;
+      card.onclick = () => selectRole(r.value);
+      grid.appendChild(card);
+    });
+
+    function selectRole(val) {
+      document.querySelectorAll('.role-card').forEach(c => c.classList.toggle('selected', c.dataset.value === val));
+      document.getElementById('targetRole').value = val;
+      document.getElementById('err-role').classList.remove('show');
+    }
+
+    // ── Step navigation ─────────────────────────────────────────────────────
+    let currentStep = 1;
+    function goStep(n) {
+      if (n > currentStep && !validateStep(currentStep)) return;
+      currentStep = n;
+      document.querySelectorAll('.step-panel').forEach((p, i) => p.classList.toggle('active', i + 1 === n));
+      document.querySelectorAll('.step').forEach((d, i) => {
+        d.classList.toggle('done', i + 1 < n);
+        d.classList.toggle('active', i + 1 === n);
+      });
+    }
+
+    // ── Validation ──────────────────────────────────────────────────────────
+    function showErr(id, show) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('show', show);
+      const input = document.getElementById(id.replace('err-', ''));
+      if (input) input.classList.toggle('invalid', show);
+      if (input && !show) input.classList.add('valid');
+    }
+
+    function validateStep(step) {
+      let ok = true;
+      if (step === 1) {
+        const name = document.getElementById('fullname').value.trim();
+        const email = document.getElementById('email').value.trim();
+        const user = document.getElementById('username').value.trim();
+        const pass = document.getElementById('password').value;
+        if (!name) { showErr('err-fullname', true); ok = false; } else showErr('err-fullname', false);
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showErr('err-email', true); ok = false; } else showErr('err-email', false);
+        if (!/^[a-zA-Z0-9_]{3,30}$/.test(user)) { showErr('err-username', true); ok = false; } else showErr('err-username', false);
+        if (pass.length < 8) { showErr('err-password', true); ok = false; } else showErr('err-password', false);
+      }
+      if (step === 2) {
+        const role = document.getElementById('targetRole').value;
+        if (!role) { document.getElementById('err-role').classList.add('show'); ok = false; }
+        else document.getElementById('err-role').classList.remove('show');
+      }
+      if (step === 3) {
+        const hours = document.getElementById('hours').value;
+        const weeks = document.getElementById('weeks').value;
+        const gh = document.getElementById('github').value.trim();
+        if (!hours) { showErr('err-hours', true); ok = false; } else showErr('err-hours', false);
+        if (!weeks) { showErr('err-weeks', true); ok = false; } else showErr('err-weeks', false);
+        if (gh && !/^[a-zA-Z0-9\-]{1,39}$/.test(gh)) { showErr('err-github', true); ok = false; } else showErr('err-github', false);
+      }
+      return ok;
+    }
+
+    // ── Live validation on blur ──────────────────────────────────────────────
+    ['fullname','email','username','password'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('blur', () => {
+        if (id === 'fullname') showErr('err-fullname', !el.value.trim());
+        if (id === 'email') showErr('err-email', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(el.value.trim()));
+        if (id === 'username') showErr('err-username', !/^[a-zA-Z0-9_]{3,30}$/.test(el.value.trim()));
+        if (id === 'password') showErr('err-password', el.value.length < 8);
+      });
+    });
+    const ghEl = document.getElementById('github');
+    if (ghEl) ghEl.addEventListener('blur', () => {
+      const v = ghEl.value.trim();
+      showErr('err-github', v && !/^[a-zA-Z0-9\-]{1,39}$/.test(v));
+    });
+
+    // ── Submit ───────────────────────────────────────────────────────────────
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!validateStep(3)) return;
+
+      const payload = {
+        fullname:   document.getElementById('fullname').value.trim(),
+        email:      document.getElementById('email').value.trim(),
+        username:   document.getElementById('username').value.trim(),
+        password:   document.getElementById('password').value,
+        college:    document.getElementById('college').value.trim(),
+        targetRole: document.getElementById('targetRole').value,
+        github:     document.getElementById('github').value.trim(),
+        hours:      parseInt(document.getElementById('hours').value) || 0,
+        budget:     parseInt(document.getElementById('budget').value) || 0,
+        weeks:      parseInt(document.getElementById('weeks').value) || 0,
+      };
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      btn.textContent = 'Creating account…';
+      document.getElementById('form-error').style.display = 'none';
+
+      try {
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (res.ok && data.ok) {
+          btn.textContent = '✅ Account created!';
+          window.showToast('Account created! Your AI roadmap will be ready when you log in 🚀', 'success');
+          setTimeout(() => location.replace('/login'), 1800);
+        } else {
+          document.getElementById('form-error').textContent = data.error || 'Registration failed. Please try again.';
+          document.getElementById('form-error').style.display = 'block';
+          btn.disabled = false;
+          btn.textContent = '🚀 Create Account & Generate Roadmap';
+        }
+      } catch (err) {
+        document.getElementById('form-error').textContent = 'Connection error. Please try again.';
+        document.getElementById('form-error').style.display = 'block';
+        btn.disabled = false;
+        btn.textContent = '🚀 Create Account & Generate Roadmap';
+      }
+    });
   </script>
 </body>
 </html>

@@ -27,7 +27,7 @@ MongoClient.connect(MONGO_URI).then(c => {
 }).catch(e => console.error('DB Error', e));
 // env parsing moved above
 const KEY = process.env.NVIDIA_API_KEY,
-  MODEL = process.env.NVIDIA_MODEL || "z-ai/glm-5.3";
+  MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.1-8b-instruct";
 const BASE = (
   process.env.NVIDIA_BASE_URL || "https://integrate.api.nvidia.com/v1"
 ).replace(/\/$/, "");
@@ -226,12 +226,165 @@ const server = http
       if (p === "/api/state") {
         if (put) {
           const newState = (await body(req)).state || null;
+          // Never overwrite a properly AI-generated state with a dummy pushState
+          if (newState && !newState._generated) {
+            const existingDoc = await stateCol.findOne({ userId: user.id });
+            if (existingDoc && existingDoc.state && existingDoc.state._generated === true) {
+              // Preserve _generated flag and merge only progress fields, not p.name/college
+              newState._generated = true;
+            }
+          }
+          // Strip p.name and p.college from state before saving — these come from users collection
+          if (newState && newState.p) {
+            delete newState.p.name;
+            delete newState.p.college;
+          }
           await stateCol.updateOne({ userId: user.id }, { $set: { state: newState } }, { upsert: true });
           return send(res, 200, { ok: true });
         }
+        const { ObjectId } = require('mongodb');
         const doc = await stateCol.findOne({ userId: user.id });
+        const userDoc = await usersCol.findOne({ _id: new ObjectId(user.id) });
+        if (doc && doc.state) {
+          if (!doc.state.p) doc.state.p = {};
+          if (userDoc) {
+            doc.state.p.name = userDoc.fullname || userDoc.username;
+            doc.state.p.college = userDoc.college || '';
+            doc.state.p.github = doc.state.p.github || userDoc.github || '';
+            doc.state.p.role = doc.state.p.role || userDoc.targetRole || '';
+            doc.state.p.hours = doc.state.p.hours || userDoc.hours || 0;
+            doc.state.p.budget = doc.state.p.budget || userDoc.budget || 0;
+            doc.state.p.weeks = doc.state.p.weeks || userDoc.weeks || 0;
+          }
+        }
         return send(res, 200, { state: doc ? doc.state : null });
       }
+      if (p === "/api/profile") {
+        const { ObjectId } = require('mongodb');
+        if (put) {
+          const b = await body(req);
+          const allowed = ['fullname','college','github','targetRole','hours','budget','weeks'];
+          const upd = {};
+          allowed.forEach(k => { if (b[k] !== undefined) upd[k] = b[k]; });
+          await usersCol.updateOne({ _id: new ObjectId(user.id) }, { $set: upd });
+          return send(res, 200, { ok: true });
+        }
+        const userDoc = await usersCol.findOne({ _id: new ObjectId(user.id) });
+        if (!userDoc) return send(res, 404, { error: 'Not found' });
+        return send(res, 200, {
+          username: userDoc.username,
+          fullname: userDoc.fullname || '',
+          college: userDoc.college || '',
+          github: userDoc.github || '',
+          targetRole: userDoc.targetRole || '',
+          hours: userDoc.hours || 0,
+          budget: userDoc.budget || 0,
+          weeks: userDoc.weeks || 0,
+          email: userDoc.email || '',
+        });
+      }
+
+      if (post && p === "/api/onboard") {
+        if (!usersCol) return send(res, 503, { error: "Database not connected." });
+        const { ObjectId } = require('mongodb');
+        const userDoc = await usersCol.findOne({ _id: new ObjectId(user.id) });
+        if (!userDoc) return send(res, 404, { error: 'User not found' });
+
+        // Only return cached if it was actually AI-generated — not dummy seed data
+        const existing = await stateCol.findOne({ userId: user.id });
+        if (existing && existing.state && existing.state._generated === true) {
+          return send(res, 200, { state: existing.state, cached: true });
+        }
+
+        // Generate personalized roadmap via LLM
+        const profile = {
+          role: userDoc.targetRole || 'Software Engineer',
+          hours: userDoc.hours || 8,
+          budget: userDoc.budget || 5000,
+          weeks: userDoc.weeks || 20,
+          college: userDoc.college || '',
+          skills: [],
+          nodes: [],
+        };
+
+        let roadmap = null;
+        try {
+          const raw = await llm(SYS.roadmap, profile, 2200);
+          roadmap = cleanRoadmap(raw);
+        } catch (e) {
+          return send(res, 502, { error: 'AI roadmap generation failed: ' + e.message });
+        }
+        if (!roadmap) return send(res, 502, { error: 'AI returned invalid roadmap' });
+
+        // Build initial state from roadmap
+        const uid6 = () => Math.random().toString(36).slice(2, 8);
+        const initialState = {
+          p: {
+            name: userDoc.fullname || userDoc.username,
+            college: userDoc.college || '',
+            role: roadmap.role || userDoc.targetRole || '',
+            hours: userDoc.hours || 8,
+            budget: userDoc.budget || 5000,
+            weeks: userDoc.weeks || 20,
+            github: userDoc.github || '',
+          },
+          skills: roadmap.nodes.map(n => ({
+            id: uid6(),
+            name: n.skill,
+            cat: n.phase === 'Prerequisite' ? 'Core' : n.phase === 'TargetRole' ? 'Projects' : 'ML',
+            lvl: 0,
+            tgt: 4,
+            ev: [],
+          })).filter((s, i, arr) => arr.findIndex(x => x.name === s.name) === i),
+          projects: roadmap.nodes
+            .filter(n => n.project && n.project.title)
+            .map(n => ({
+              id: uid6(),
+              t: n.project.title,
+              tags: [n.skill],
+              st: 'Planned',
+              rub: (n.project.rubric || []).map(c => ({ c, p: 0 })),
+              sk: [n.skill],
+              node: n.id,
+              ver: null,
+              req: false,
+              deadline: null,
+              why: n.whyYou || '',
+            })),
+          nodes: roadmap.nodes.map(n => ({
+            id: n.id,
+            t: n.title,
+            ph: n.phase,
+            h: n.hours,
+            paid: 0,
+            req: n.requires || [],
+            sk: [n.skill],
+            pr: n.phase === 'TargetRole' ? 5 : n.phase === 'Specialization' ? 3 : 2,
+            why: n.why || '',
+            whyYou: n.whyYou || '',
+            notes: '',
+            items: (n.elements || []).map(el => ({
+              id: uid6(),
+              text: el,
+              el: el,
+              done: 0,
+              skip: 0,
+            })),
+          })),
+          act: [`Generated personalized roadmap for ${roadmap.role}`],
+          route: {},
+          rev: null,
+          known: {},
+          extra: {},
+          ts: Date.now(),
+          _generated: true,
+          _summary: roadmap.summary || '',
+        };
+
+        await stateCol.updateOne({ userId: user.id }, { $set: { state: initialState } }, { upsert: true });
+        return send(res, 200, { state: initialState, cached: false });
+      }
+
       if (p === "/api/rv") {
         if (put) {
           const ent = (await body(req)).entries || {};
@@ -319,7 +472,7 @@ const server = http
         const existing = await usersCol.findOne({ username: b.username });
         if (existing) return send(res, 400, { error: 'Username taken' });
         const hashed = bcrypt.hashSync(b.password, 10);
-        await usersCol.insertOne({ username: b.username, password: hashed, fullname: b.fullname || b.username, email: b.email, college: b.college || '' });
+        await usersCol.insertOne({ username: b.username, password: hashed, fullname: b.fullname || b.username, email: b.email || '', college: b.college || '', targetRole: b.targetRole || '', github: b.github || '', hours: b.hours || 0, budget: b.budget || 0, weeks: b.weeks || 0 });
         return send(res, 200, { ok: true, message: "Registration successful! Please login." });
       }
       // static files; /mentor and /review/* open the app in mentor mode
