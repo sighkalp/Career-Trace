@@ -27,7 +27,7 @@ MongoClient.connect(MONGO_URI).then(c => {
 }).catch(e => console.error('DB Error', e));
 // env parsing moved above
 const KEY = process.env.NVIDIA_API_KEY,
-  MODEL = process.env.NVIDIA_MODEL || "meta/llama-3.1-70b-instruct";
+  MODEL = process.env.NVIDIA_MODEL || "z-ai/glm-5.3-flash";
 const BASE = (
   process.env.NVIDIA_BASE_URL || "https://integrate.api.nvidia.com/v1"
 ).replace(/\/$/, "");
