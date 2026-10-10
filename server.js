@@ -311,7 +311,7 @@ const server = http
           return send(res, 401, { error: "Invalid username or password" });
         }
         const token = jwt.sign({ id: userDoc._id, username: userDoc.username }, JWT_SECRET, { expiresIn: '7d' });
-        return send(res, 200, { ok: true, token, user: { username: userDoc.username } });
+        return send(res, 200, { ok: true, token, user: { username: userDoc.username, fullname: userDoc.fullname, college: userDoc.college } });
       }
       if (post && p === "/api/auth/register") {
         if (!usersCol) return send(res, 503, { error: "Database not connected. Check MongoDB Atlas Network Access (IP Whitelist)." });
@@ -319,7 +319,7 @@ const server = http
         const existing = await usersCol.findOne({ username: b.username });
         if (existing) return send(res, 400, { error: 'Username taken' });
         const hashed = bcrypt.hashSync(b.password, 10);
-        await usersCol.insertOne({ username: b.username, password: hashed });
+        await usersCol.insertOne({ username: b.username, password: hashed, fullname: b.fullname || b.username, email: b.email, college: b.college || '' });
         return send(res, 200, { ok: true, message: "Registration successful! Please login." });
       }
       // static files; /mentor and /review/* open the app in mentor mode

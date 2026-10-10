@@ -1317,16 +1317,16 @@
         cap: [610, 160],
       };
       let S;
-      function seed() {
+      function seed(u) {
         S = {
           p: {
-            name: "Aarav Mehta",
-            college: "DTU, Year 3",
+            name: u && u.fullname ? u.fullname : (u ? u.username : "Aarav Mehta"),
+            college: u && u.college ? u.college : "DTU, Year 3",
             role: "Data Scientist",
             hours: 8,
             budget: 5000,
             weeks: 20,
-            github: "aarav-m",
+            github: u ? u.username : "aarav-m",
           },
           skills: [
             {
@@ -4438,16 +4438,12 @@
       try { currentUser = JSON.parse(localStorage.getItem('ct_user')); } catch(e) {}
       
       if (!S || !S.nodes || !S.known) {
-        if (currentUser) {
-          blank();
-          S.p.name = currentUser.username;
-        } else {
-          seed();
-        }
+        seed(currentUser);
+        S.ts = Date.now();
       } else if (currentUser && S.p && S.p.name === "Aarav Mehta" && currentUser.username !== "Aarav Mehta") {
         // Clear cached demo data if they logged into a real account
-        blank();
-        S.p.name = currentUser.username;
+        seed(currentUser);
+        S.ts = Date.now();
       } else {
         S.extra = S.extra || {};
         relayout();
